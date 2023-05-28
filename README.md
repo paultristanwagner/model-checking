@@ -6,22 +6,14 @@ and can be read up in the book [Principles of Model Checking](https://mitpress.m
 Model checking is a technique used to formally verify whether a given system model satisfies a desired property or specification. In this project, model checking algorithms are implemented to analyze transition systems.
 
 ## How to build and run the project
-Clone the git repository:
-```
-git clone https://github.com/paultristanwagner/model-checking.git
-```
-Navigate into the created directory:
-```
-cd model-checking
-```
-Let Gradle build the project (Use the Gradle wrapper as shown here or install Gradle >= 8.1.1):
-```
-./gradlew jar
-```
-Run the project:
-```
-java -jar build/libs/model-checking-1.0-SNAPSHOT.jar
-```
+Clone the git repository: <br> 
+``git clone https://github.com/paultristanwagner/model-checking.git`` <br>
+Navigate into the created directory: <br>
+``cd model-checking`` <br> 
+Let Gradle build the project (Use the Gradle wrapper as shown here or install Gradle >= 8.1.1): <br>
+``./gradlew jar`` <br>
+Run the project: <br>
+``java -jar build/libs/model-checking-1.0-SNAPSHOT.jar`` <br>
 Now you should see the command line asking you to specify a file defining a transition system.
 
 ## Transition systems
