@@ -1,0 +1,13 @@
+# IntelliJ
+.idea/
+out/
+*.iml
+
+# Build files
+build/
+
+# Gradle
+.gradle/
+
+# Include gradle wrapper
+!gradle/wrapper
