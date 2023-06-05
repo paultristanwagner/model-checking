@@ -5,7 +5,7 @@ import java.util.*;
 public class TransitionSystemBuilder {
   
   private final List<String> states;
-  private final List<Transition> transitions;
+  private final List<TSTransition> transitions;
   private final List<String> initialStates;
   private final List<String> atomicPropositions;
   private final Map<String, List<String>> labelingFunction;
@@ -17,19 +17,27 @@ public class TransitionSystemBuilder {
     this.atomicPropositions = new ArrayList<>();
     this.labelingFunction = new HashMap<>();
   }
-  
+
+  public TransitionSystemBuilder addStates( String... states ) {
+    for ( String state : states ) {
+      addState( state );
+    }
+
+    return this;
+  }
+
   public TransitionSystemBuilder addState( String state ) {
     this.states.add( state );
     return this;
   }
   
-  public TransitionSystemBuilder addTransition( Transition transition ) {
+  public TransitionSystemBuilder addTransition( TSTransition transition ) {
     this.transitions.add( transition );
     return this;
   }
   
   public TransitionSystemBuilder addTransition(String from, String to) {
-    this.transitions.add( Transition.of( from, to ) );
+    this.transitions.add( TSTransition.of( from, to ) );
     return this;
   }
   
@@ -69,5 +77,9 @@ public class TransitionSystemBuilder {
   
   public TransitionSystem build() {
     return new TransitionSystem( states, transitions, initialStates, atomicPropositions, labelingFunction );
+  }
+
+  public List<String> getInitialStates() {
+    return initialStates;
   }
 }

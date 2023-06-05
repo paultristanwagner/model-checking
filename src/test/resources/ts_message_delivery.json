@@ -1,0 +1,18 @@
+{
+  "states": ["start","try_to_send","lost","delivered"],
+  "transitions": [
+    ["start","try_to_send"],
+    ["try_to_send","lost"],
+    ["lost","try_to_send"],
+    ["try_to_send","delivered"],
+    ["delivered","start"]
+  ],
+  "initialStates": ["start"],
+  "atomicPropositions": ["start","try_to_send","lost","delivered"],
+  "labelingFunction": {
+    "start": ["start"],
+    "try_to_send": ["try_to_send"],
+    "lost": ["lost"],
+    "delivered": ["delivered"]
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "states": [
+    "p1",
+    "p2"
+  ],
+  "alphabet": [
+    "A"
+  ],
+  "initialStates": [
+    "p1"
+  ],
+  "acceptingStates": [
+    "p2"
+  ],
+  "transitions": [
+    [
+      "p1",
+      "A",
+      "p2"
+    ],
+    [
+      "p2",
+      "A",
+      "p1"
+    ]
+  ]
+}
