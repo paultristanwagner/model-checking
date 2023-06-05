@@ -8,7 +8,7 @@ public class LTLIdentifierFormula extends LTLFormula {
         this.identifier = identifier;
     }
 
-    public static LTLIdentifierFormula of( String identifier ) {
+    public static LTLIdentifierFormula identifier(String identifier ) {
         return new LTLIdentifierFormula( identifier );
     }
 

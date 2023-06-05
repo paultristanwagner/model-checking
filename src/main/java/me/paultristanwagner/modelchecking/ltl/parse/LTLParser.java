@@ -10,7 +10,29 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static me.paultristanwagner.modelchecking.ltl.parse.LTLLexer.*;
+import static me.paultristanwagner.modelchecking.ltl.formula.LTLAlwaysFormula.always;
+import static me.paultristanwagner.modelchecking.ltl.formula.LTLAndFormula.and;
+import static me.paultristanwagner.modelchecking.ltl.formula.LTLEventuallyFormula.eventually;
+import static me.paultristanwagner.modelchecking.ltl.formula.LTLFalseFormula.FALSE;
+import static me.paultristanwagner.modelchecking.ltl.formula.LTLIdentifierFormula.identifier;
+import static me.paultristanwagner.modelchecking.ltl.formula.LTLNextFormula.next;
+import static me.paultristanwagner.modelchecking.ltl.formula.LTLNotFormula.not;
+import static me.paultristanwagner.modelchecking.ltl.formula.LTLOrFormula.or;
+import static me.paultristanwagner.modelchecking.ltl.formula.LTLParenthesisFormula.parenthesis;
+import static me.paultristanwagner.modelchecking.ltl.formula.LTLTrueFormula.TRUE;
+import static me.paultristanwagner.modelchecking.ltl.formula.LTLUntilFormula.until;
+import static me.paultristanwagner.modelchecking.ltl.parse.LTLLexer.ALWAYS;
+import static me.paultristanwagner.modelchecking.ltl.parse.LTLLexer.AND;
+import static me.paultristanwagner.modelchecking.ltl.parse.LTLLexer.EVENTUALLY;
+import static me.paultristanwagner.modelchecking.ltl.parse.LTLLexer.FALSE;
+import static me.paultristanwagner.modelchecking.ltl.parse.LTLLexer.IDENTIFIER;
+import static me.paultristanwagner.modelchecking.ltl.parse.LTLLexer.LPAREN;
+import static me.paultristanwagner.modelchecking.ltl.parse.LTLLexer.NEXT;
+import static me.paultristanwagner.modelchecking.ltl.parse.LTLLexer.NOT;
+import static me.paultristanwagner.modelchecking.ltl.parse.LTLLexer.OR;
+import static me.paultristanwagner.modelchecking.ltl.parse.LTLLexer.RPAREN;
+import static me.paultristanwagner.modelchecking.ltl.parse.LTLLexer.TRUE;
+import static me.paultristanwagner.modelchecking.ltl.parse.LTLLexer.UNTIL;
 
 public class LTLParser implements Parser<LTLFormula> {
 
@@ -71,7 +93,7 @@ public class LTLParser implements Parser<LTLFormula> {
             return first;
         }
 
-        return LTLOrFormula.of(components);
+        return or(components);
     }
 
     private LTLFormula B(LTLLexer lexer) {
@@ -88,7 +110,7 @@ public class LTLParser implements Parser<LTLFormula> {
             return first;
         }
 
-        return LTLAndFormula.of(components);
+        return and(components);
     }
 
     private LTLFormula C(LTLLexer lexer) {
@@ -97,7 +119,7 @@ public class LTLParser implements Parser<LTLFormula> {
         while (lexer.hasNextToken() && lexer.getLookahead().getType() == UNTIL) {
             lexer.consume(UNTIL);
             LTLFormula second = D(lexer);
-            formula = LTLUntilFormula.of(formula, second);
+            formula = until(formula, second);
         }
 
         return formula;
@@ -130,44 +152,44 @@ public class LTLParser implements Parser<LTLFormula> {
 
     private LTLNotFormula parseNot(LTLLexer lexer) {
         lexer.consume(NOT);
-        return LTLNotFormula.of(D(lexer));
+        return not(D(lexer));
     }
 
     private LTLNextFormula parseNext(LTLLexer lexer) {
         lexer.consume(NEXT);
-        return LTLNextFormula.of(A(lexer));
+        return next(A(lexer));
     }
 
     private LTLAlwaysFormula parseAlways(LTLLexer lexer) {
         lexer.consume(ALWAYS);
-        return LTLAlwaysFormula.of(A(lexer));
+        return always(A(lexer));
     }
 
     private LTLEventuallyFormula parseEventually(LTLLexer lexer) {
         lexer.consume(EVENTUALLY);
-        return LTLEventuallyFormula.of(A(lexer));
+        return eventually(A(lexer));
     }
 
     private LTLTrueFormula parseTrue(LTLLexer lexer) {
         lexer.consume(TRUE);
-        return new LTLTrueFormula();
+        return TRUE();
     }
 
     private LTLFalseFormula parseFalse(LTLLexer lexer) {
         lexer.consume(FALSE);
-        return new LTLFalseFormula();
+        return FALSE();
     }
 
     private LTLFormula parseParenthesis(LTLLexer lexer) {
         lexer.consume(LPAREN);
         LTLFormula formula = A(lexer);
         lexer.consume(RPAREN);
-        return LTLParenthesisFormula.of(formula);
+        return parenthesis(formula);
     }
 
     private LTLIdentifierFormula parseIdentifier(LTLLexer lexer) {
         Token token = lexer.getLookahead();
         lexer.consume(IDENTIFIER);
-        return LTLIdentifierFormula.of(token.getValue());
+        return identifier(token.getValue());
     }
 }

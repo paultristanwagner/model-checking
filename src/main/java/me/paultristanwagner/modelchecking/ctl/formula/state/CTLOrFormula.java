@@ -13,11 +13,11 @@ public class CTLOrFormula extends CTLFormula {
     this.components = components;
   }
   
-  public static CTLOrFormula of(CTLFormula... components) {
+  public static CTLOrFormula or(CTLFormula... components) {
     return new CTLOrFormula( Arrays.asList( components ) );
   }
   
-  public static CTLOrFormula of(List<CTLFormula> components) {
+  public static CTLOrFormula or(List<CTLFormula> components) {
     return new CTLOrFormula( components );
   }
   

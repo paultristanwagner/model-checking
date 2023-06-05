@@ -12,7 +12,7 @@ public class CTLAllFormula extends CTLFormula {
     this.pathFormula = pathFormula;
   }
   
-  public static CTLAllFormula of( CTLPathFormula pathFormula ) {
+  public static CTLAllFormula forAll(CTLPathFormula pathFormula ) {
     return new CTLAllFormula( pathFormula );
   }
   

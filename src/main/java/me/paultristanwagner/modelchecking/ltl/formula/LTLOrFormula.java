@@ -12,11 +12,11 @@ public class LTLOrFormula extends LTLFormula {
         this.components = components;
     }
 
-    public static LTLOrFormula of(LTLFormula... components) {
+    public static LTLOrFormula or(LTLFormula... components) {
         return new LTLOrFormula( List.of( components ) );
     }
 
-    public static LTLOrFormula of(List<LTLFormula> components) {
+    public static LTLOrFormula or(List<LTLFormula> components) {
         return new LTLOrFormula( components );
     }
 

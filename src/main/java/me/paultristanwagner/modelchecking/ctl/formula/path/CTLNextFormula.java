@@ -13,7 +13,7 @@ public class CTLNextFormula extends CTLPathFormula {
     this.stateFormula = stateFormula;
   }
   
-  public static CTLNextFormula of( CTLFormula stateFormula ) {
+  public static CTLNextFormula next(CTLFormula stateFormula ) {
     return new CTLNextFormula( stateFormula );
   }
   

@@ -13,11 +13,11 @@ public class CTLAndFormula extends CTLFormula {
     this.components = components;
   }
   
-  public static CTLAndFormula of(CTLFormula... components) {
+  public static CTLAndFormula and(CTLFormula... components) {
     return new CTLAndFormula( Arrays.asList( components ) );
   }
   
-  public static CTLAndFormula of(List<CTLFormula> components) {
+  public static CTLAndFormula and(List<CTLFormula> components) {
     return new CTLAndFormula( components );
   }
   

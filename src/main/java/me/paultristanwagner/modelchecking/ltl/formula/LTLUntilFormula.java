@@ -12,7 +12,7 @@ public class LTLUntilFormula extends LTLFormula {
         this.right = right;
     }
 
-    public static LTLFormula of( LTLFormula left, LTLFormula right ) {
+    public static LTLFormula until(LTLFormula left, LTLFormula right ) {
         return new LTLUntilFormula( left, right );
     }
 

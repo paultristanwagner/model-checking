@@ -72,7 +72,7 @@ public class CTLParser implements Parser<CTLFormula> {
       return first;
     }
 
-    return CTLOrFormula.of(components);
+    return CTLOrFormula.or(components);
   }
 
   private CTLFormula B( Lexer lexer) {
@@ -89,7 +89,7 @@ public class CTLParser implements Parser<CTLFormula> {
       return first;
     }
 
-    return CTLAndFormula.of(components);
+    return CTLAndFormula.and(components);
   }
 
   private CTLFormula C( Lexer lexer) {
@@ -117,21 +117,21 @@ public class CTLParser implements Parser<CTLFormula> {
     lexer.consume(NOT);
 
     CTLFormula argument = C(lexer);
-    return CTLNotFormula.of(argument);
+    return CTLNotFormula.not(argument);
   }
 
   private CTLAllFormula parseAllFormula( Lexer lexer) {
     lexer.consume(ALL);
 
     CTLPathFormula pathFormula = parsePathFormula(lexer);
-    return CTLAllFormula.of(pathFormula);
+    return CTLAllFormula.forAll(pathFormula);
   }
 
   private CTLExistsFormula parseExistsFormula( Lexer lexer) {
     lexer.consume(EXISTS);
 
     CTLPathFormula pathFormula = parsePathFormula(lexer);
-    return CTLExistsFormula.of(pathFormula);
+    return CTLExistsFormula.exists(pathFormula);
   }
 
   private CTLFormula parseParenthesisFormula( Lexer lexer) {
@@ -139,19 +139,19 @@ public class CTLParser implements Parser<CTLFormula> {
     CTLFormula inner = parseStateFormula(lexer);
     lexer.consume(RPAREN);
 
-    return CTLParenthesisFormula.of(inner);
+    return CTLParenthesisFormula.parenthesis(inner);
   }
 
   private CTLTrueFormula parseTrueFormula( Lexer lexer) {
     lexer.consume(TRUE);
 
-    return new CTLTrueFormula();
+    return CTLTrueFormula.TRUE();
   }
 
   private CTLFalseFormula parseFalseFormula( Lexer lexer) {
     lexer.consume(FALSE);
 
-    return new CTLFalseFormula();
+    return CTLFalseFormula.FALSE();
   }
 
   private CTLIdentifierFormula parseIdentifierFormula( Lexer lexer) {
@@ -160,7 +160,7 @@ public class CTLParser implements Parser<CTLFormula> {
     String identifier = lookahead.getValue();
     lexer.consume(IDENTIFIER);
 
-    return CTLIdentifierFormula.of(identifier);
+    return CTLIdentifierFormula.identifier(identifier);
   }
 
   private CTLPathFormula parsePathFormula( Lexer lexer) {
@@ -186,7 +186,7 @@ public class CTLParser implements Parser<CTLFormula> {
     lexer.consume(NEXT);
 
     CTLFormula stateFormula = parseStateFormula(lexer);
-    return CTLNextFormula.of(stateFormula);
+    return CTLNextFormula.next(stateFormula);
   }
 
   private CTLUntilFormula parseUntilFormula( Lexer lexer) {
@@ -196,20 +196,20 @@ public class CTLParser implements Parser<CTLFormula> {
 
     CTLFormula right = parseStateFormula(lexer);
 
-    return CTLUntilFormula.of(left, right);
+    return CTLUntilFormula.until(left, right);
   }
   
   private CTLEventuallyFormula parseEventuallyFormula( Lexer lexer) {
     lexer.consume( EVENTUALLY );
     
     CTLFormula stateFormula = parseStateFormula( lexer );
-    return CTLEventuallyFormula.of(stateFormula);
+    return CTLEventuallyFormula.eventually(stateFormula);
   }
   
   private CTLAlwaysFormula parseAlwaysFormula( Lexer lexer) {
     lexer.consume( ALWAYS );
     
     CTLFormula stateFormula = parseStateFormula( lexer );
-    return CTLAlwaysFormula.of(stateFormula);
+    return CTLAlwaysFormula.always(stateFormula);
   }
 }

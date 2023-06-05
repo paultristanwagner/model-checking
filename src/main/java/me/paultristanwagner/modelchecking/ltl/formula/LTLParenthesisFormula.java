@@ -8,7 +8,7 @@ public class LTLParenthesisFormula extends LTLFormula {
         this.formula = formula;
     }
 
-    public static LTLParenthesisFormula of( LTLFormula formula ) {
+    public static LTLParenthesisFormula parenthesis(LTLFormula formula ) {
         return new LTLParenthesisFormula( formula );
     }
 

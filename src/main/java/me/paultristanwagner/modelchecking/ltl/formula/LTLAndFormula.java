@@ -13,11 +13,11 @@ public class LTLAndFormula extends LTLFormula {
         this.components = components;
     }
 
-    public static LTLAndFormula of(LTLFormula... components) {
+    public static LTLAndFormula and(LTLFormula... components) {
         return new LTLAndFormula(Arrays.asList(components));
     }
 
-    public static LTLAndFormula of(List<LTLFormula> components) {
+    public static LTLAndFormula and(List<LTLFormula> components) {
         return new LTLAndFormula(components);
     }
 

@@ -13,7 +13,7 @@ public class CTLEventuallyFormula extends CTLPathFormula {
     this.stateFormula = stateFormula;
   }
   
-  public static CTLEventuallyFormula of( CTLFormula stateFormula) {
+  public static CTLEventuallyFormula eventually(CTLFormula stateFormula) {
     return new CTLEventuallyFormula( stateFormula );
   }
   

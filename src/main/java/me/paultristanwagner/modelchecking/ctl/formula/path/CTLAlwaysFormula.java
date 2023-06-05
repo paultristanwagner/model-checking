@@ -13,7 +13,7 @@ public class CTLAlwaysFormula extends CTLPathFormula {
     this.stateFormula = stateFormula;
   }
   
-  public static CTLAlwaysFormula of(CTLFormula stateFormula) {
+  public static CTLAlwaysFormula always(CTLFormula stateFormula) {
     return new CTLAlwaysFormula( stateFormula );
   }
   

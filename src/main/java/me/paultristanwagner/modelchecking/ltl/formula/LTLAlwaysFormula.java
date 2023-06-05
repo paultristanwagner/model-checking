@@ -10,7 +10,7 @@ public class LTLAlwaysFormula extends LTLFormula {
         this.formula = formula;
     }
 
-    public static LTLAlwaysFormula of( LTLFormula formula ) {
+    public static LTLAlwaysFormula always(LTLFormula formula ) {
         return new LTLAlwaysFormula( formula );
     }
 

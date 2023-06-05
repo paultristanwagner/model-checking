@@ -12,7 +12,7 @@ public class CTLExistsFormula extends CTLFormula {
     this.pathFormula = pathFormula;
   }
   
-  public static CTLExistsFormula of( CTLPathFormula pathFormula ) {
+  public static CTLExistsFormula exists(CTLPathFormula pathFormula ) {
     return new CTLExistsFormula( pathFormula );
   }
   

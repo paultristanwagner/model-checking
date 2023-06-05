@@ -10,7 +10,7 @@ private final LTLFormula formula;
         this.formula = formula;
     }
 
-    public static LTLEventuallyFormula of( LTLFormula formula ) {
+    public static LTLEventuallyFormula eventually(LTLFormula formula ) {
         return new LTLEventuallyFormula( formula );
     }
 

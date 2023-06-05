@@ -10,7 +10,7 @@ public class LTLNextFormula extends LTLFormula {
         this.formula = formula;
     }
 
-    public static LTLNextFormula of( LTLFormula formula ) {
+    public static LTLNextFormula next(LTLFormula formula ) {
         return new LTLNextFormula( formula );
     }
 

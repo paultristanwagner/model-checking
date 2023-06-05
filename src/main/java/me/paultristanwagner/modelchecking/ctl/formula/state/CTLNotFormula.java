@@ -10,7 +10,7 @@ public class CTLNotFormula extends CTLFormula {
     this.argument = argument;
   }
   
-  public static CTLNotFormula of(CTLFormula argument) {
+  public static CTLNotFormula not(CTLFormula argument) {
     return new CTLNotFormula( argument );
   }
   

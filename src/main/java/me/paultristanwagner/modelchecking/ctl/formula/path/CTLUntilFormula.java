@@ -14,7 +14,7 @@ public class CTLUntilFormula extends CTLPathFormula {
         this.right = right;
     }
 
-    public static CTLUntilFormula of(CTLFormula left, CTLFormula right) {
+    public static CTLUntilFormula until(CTLFormula left, CTLFormula right) {
         return new CTLUntilFormula(left, right);
     }
 

@@ -6,6 +6,17 @@ import me.paultristanwagner.modelchecking.ctl.formula.state.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static me.paultristanwagner.modelchecking.ctl.formula.path.CTLAlwaysFormula.always;
+import static me.paultristanwagner.modelchecking.ctl.formula.path.CTLNextFormula.next;
+import static me.paultristanwagner.modelchecking.ctl.formula.path.CTLUntilFormula.until;
+import static me.paultristanwagner.modelchecking.ctl.formula.state.CTLAllFormula.forAll;
+import static me.paultristanwagner.modelchecking.ctl.formula.state.CTLAndFormula.and;
+import static me.paultristanwagner.modelchecking.ctl.formula.state.CTLExistsFormula.exists;
+import static me.paultristanwagner.modelchecking.ctl.formula.state.CTLNotFormula.not;
+import static me.paultristanwagner.modelchecking.ctl.formula.state.CTLOrFormula.or;
+import static me.paultristanwagner.modelchecking.ctl.formula.state.CTLParenthesisFormula.parenthesis;
+import static me.paultristanwagner.modelchecking.ctl.formula.state.CTLTrueFormula.TRUE;
+
 public class CTLENFConverter {
 
     // todo: improve code readability
@@ -34,7 +45,7 @@ public class CTLENFConverter {
         } else if (formula instanceof CTLIdentifierFormula) {
             return formula;
         } else if (formula instanceof CTLParenthesisFormula parenthesisFormula) {
-            return CTLParenthesisFormula.of(convert(parenthesisFormula.getInner()));
+            return parenthesis(convert(parenthesisFormula.getInner()));
         } else if (formula instanceof CTLTrueFormula || formula instanceof CTLFalseFormula) {
             return formula;
         } else if (formula instanceof CTLOrFormula orFormula) {
@@ -43,16 +54,16 @@ public class CTLENFConverter {
             for (CTLFormula argument : arguments) {
                 convertedArguments.add(convert(argument));
             }
-            return CTLOrFormula.of(convertedArguments);
+            return or(convertedArguments);
         } else if (formula instanceof CTLAndFormula andFormula) {
             List<CTLFormula> arguments = andFormula.getComponents();
             List<CTLFormula> convertedArguments = new ArrayList<>();
             for (CTLFormula argument : arguments) {
                 convertedArguments.add(convert(argument));
             }
-            return CTLAndFormula.of(convertedArguments);
+            return and(convertedArguments);
         } else if (formula instanceof CTLNotFormula notFormula) {
-            return CTLNotFormula.of(convert(notFormula.getArgument()));
+            return not(convert(notFormula.getArgument()));
         }
 
         throw new UnsupportedOperationException();
@@ -61,17 +72,15 @@ public class CTLENFConverter {
     private CTLFormula convertExistsFormula(CTLExistsFormula formula) {
         CTLPathFormula pathFormula = formula.getPathFormula();
         if (pathFormula instanceof CTLAlwaysFormula alwaysFormula) {
-            return CTLExistsFormula.of(CTLAlwaysFormula.of(convert(alwaysFormula.getStateFormula())));
+            return exists(always(convert(alwaysFormula.getStateFormula())));
         } else if (pathFormula instanceof CTLEventuallyFormula eventuallyFormula) {
             // EXISTS EVENTUALLY PHI = EXISTS (TRUE UNTIL PHI)
-            CTLUntilFormula untilFormula =
-                    CTLUntilFormula.of(new CTLTrueFormula(), eventuallyFormula.getStateFormula());
-            return convert(CTLExistsFormula.of(untilFormula));
+            CTLUntilFormula untilFormula = until(TRUE(), eventuallyFormula.getStateFormula());
+            return convert(exists(untilFormula));
         } else if (pathFormula instanceof CTLNextFormula nextFormula) {
-            return CTLExistsFormula.of(CTLNextFormula.of(convert(nextFormula.getStateFormula())));
+            return exists(next(convert(nextFormula.getStateFormula())));
         } else if (pathFormula instanceof CTLUntilFormula untilFormula) {
-            return CTLExistsFormula.of(
-                    CTLUntilFormula.of(convert(untilFormula.getLeft()), convert(untilFormula.getRight())));
+            return exists(until(convert(untilFormula.getLeft()), convert(untilFormula.getRight())));
         }
 
         throw new UnsupportedOperationException();
@@ -82,8 +91,7 @@ public class CTLENFConverter {
         if (pathFormula instanceof CTLNextFormula nextFormula) {
 
             CTLFormula stateFormula = nextFormula.getStateFormula();
-            return CTLNotFormula.of(
-                    CTLExistsFormula.of(CTLNextFormula.of(CTLNotFormula.of(convert(stateFormula)))));
+            return not(exists(next(not(convert(stateFormula)))));
         } else if (pathFormula instanceof CTLUntilFormula untilFormula) {
             CTLFormula phi = untilFormula.getLeft();
             CTLFormula psi = untilFormula.getRight();
@@ -91,36 +99,32 @@ public class CTLENFConverter {
             CTLFormula phiConverted = convert(phi);
             CTLFormula psiConverted = convert(psi);
 
-            CTLFormula notPhiConverted = CTLNotFormula.of(phiConverted);
-            CTLFormula notPsiConverted = CTLNotFormula.of(psiConverted);
+            CTLFormula notPhiConverted = not(phiConverted);
+            CTLFormula notPsiConverted = not(psiConverted);
 
-            CTLFormula notPhiAndNotPsi = CTLAndFormula.of(notPhiConverted, notPsiConverted);
+            CTLFormula notPhiAndNotPsi = and(notPhiConverted, notPsiConverted);
 
-            CTLFormula left =
-                    CTLNotFormula.of(
-                            CTLExistsFormula.of(CTLUntilFormula.of(notPsiConverted, notPhiAndNotPsi)));
-            CTLFormula right =
-                    CTLNotFormula.of(CTLExistsFormula.of(CTLAlwaysFormula.of(notPsiConverted)));
+            CTLFormula left = not(exists(until(notPsiConverted, notPhiAndNotPsi)));
+            CTLFormula right = not(exists(always(notPsiConverted)));
 
-            return CTLAndFormula.of(left, right);
+            return and(left, right);
         } else if (pathFormula instanceof CTLAlwaysFormula alwaysFormula) {
             CTLFormula stateFormula = alwaysFormula.getStateFormula();
             CTLFormula stateFormulaConverted = convert(stateFormula);
 
             // ALL ALWAYS PHI = NOT EXISTS EVENTUALLY NOT PHI = NOT EXISTS (TRUE UNTIL NOT PHI)
-            CTLFormula notConvertedStateFormula = CTLNotFormula.of(stateFormulaConverted);
-            CTLUntilFormula untilFormula =
-                    CTLUntilFormula.of(new CTLTrueFormula(), notConvertedStateFormula);
-            CTLExistsFormula existsFormula = CTLExistsFormula.of(untilFormula);
+            CTLFormula notConvertedStateFormula = not(stateFormulaConverted);
+            CTLUntilFormula untilFormula = until(TRUE(), notConvertedStateFormula);
+            CTLExistsFormula existsFormula = exists(untilFormula);
 
-            return CTLNotFormula.of(existsFormula);
+            return not(existsFormula);
         } else if (pathFormula instanceof CTLEventuallyFormula eventuallyFormula) {
             CTLFormula stateFormula = eventuallyFormula.getStateFormula();
 
             // ALL EVENTUALLY PHI = ALL (TRUE UNTIL PHI)
 
-            CTLUntilFormula untilFormula = CTLUntilFormula.of(new CTLTrueFormula(), stateFormula);
-            CTLAllFormula allFormula = CTLAllFormula.of(untilFormula);
+            CTLUntilFormula untilFormula = until(TRUE(), stateFormula);
+            CTLAllFormula allFormula = forAll(untilFormula);
 
             return convertAllFormula(allFormula);
         }

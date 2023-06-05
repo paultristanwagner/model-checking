@@ -8,7 +8,7 @@ public class CTLIdentifierFormula extends CTLFormula {
     this.identifier = identifier;
   }
   
-  public static CTLIdentifierFormula of( String identifier ) {
+  public static CTLIdentifierFormula identifier(String identifier ) {
     return new CTLIdentifierFormula( identifier );
   }
   

@@ -8,7 +8,7 @@ public class CTLParenthesisFormula extends CTLFormula {
     this.inner = inner;
   }
   
-  public static CTLParenthesisFormula of(CTLFormula inner) {
+  public static CTLParenthesisFormula parenthesis(CTLFormula inner) {
     return new CTLParenthesisFormula( inner );
   }
   
@@ -18,6 +18,10 @@ public class CTLParenthesisFormula extends CTLFormula {
   
   @Override
   public String toString() {
+    if (inner instanceof CTLParenthesisFormula) {
+      return inner.toString();
+    }
+
     return "(" + inner + ")";
   }
 }

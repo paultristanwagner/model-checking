@@ -1,7 +1,5 @@
 package me.paultristanwagner.modelchecking.ltl.formula;
 
-import me.paultristanwagner.modelchecking.util.Symbol;
-
 import static me.paultristanwagner.modelchecking.util.Symbol.NOT_SYMBOL;
 
 public class LTLNotFormula extends LTLFormula {
@@ -12,7 +10,7 @@ public class LTLNotFormula extends LTLFormula {
         this.formula = formula;
     }
 
-    public static LTLNotFormula of( LTLFormula formula ) {
+    public static LTLNotFormula not(LTLFormula formula ) {
         return new LTLNotFormula( formula );
     }
 
