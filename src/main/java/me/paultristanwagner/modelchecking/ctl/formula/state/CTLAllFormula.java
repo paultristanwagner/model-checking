@@ -2,7 +2,7 @@ package me.paultristanwagner.modelchecking.ctl.formula.state;
 
 import me.paultristanwagner.modelchecking.ctl.formula.path.CTLPathFormula;
 
-import static me.paultristanwagner.modelchecking.ctl.parse.CTLLexer.UNIVERSAL_QUANTIFIER_SYMBOL;
+import static me.paultristanwagner.modelchecking.util.Symbol.UNIVERSAL_QUANTIFIER_SYMBOL;
 
 public class CTLAllFormula extends CTLFormula {
   

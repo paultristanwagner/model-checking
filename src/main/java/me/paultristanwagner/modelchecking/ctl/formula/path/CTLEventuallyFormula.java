@@ -3,7 +3,7 @@ package me.paultristanwagner.modelchecking.ctl.formula.path;
 import me.paultristanwagner.modelchecking.ctl.formula.state.CTLFormula;
 import me.paultristanwagner.modelchecking.ctl.formula.state.CTLParenthesisFormula;
 
-import static me.paultristanwagner.modelchecking.ctl.parse.CTLLexer.EVENTUALLY_SYMBOL;
+import static me.paultristanwagner.modelchecking.util.Symbol.EVENTUALLY_SYMBOL;
 
 public class CTLEventuallyFormula extends CTLPathFormula {
   

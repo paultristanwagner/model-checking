@@ -8,7 +8,7 @@ public class LTLParenthesisFormula extends LTLFormula {
         this.formula = formula;
     }
 
-    public static LTLFormula of( LTLFormula formula ) {
+    public static LTLParenthesisFormula of( LTLFormula formula ) {
         return new LTLParenthesisFormula( formula );
     }
 
@@ -18,6 +18,10 @@ public class LTLParenthesisFormula extends LTLFormula {
 
     @Override
     public String toString() {
+        if (formula instanceof LTLUntilFormula || formula instanceof LTLParenthesisFormula) {
+            return formula.toString();
+        }
+
         return "(" + formula + ")";
     }
 }

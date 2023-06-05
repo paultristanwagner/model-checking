@@ -1,6 +1,6 @@
 package me.paultristanwagner.modelchecking.ctl.formula.state;
 
-import static me.paultristanwagner.modelchecking.ctl.parse.CTLLexer.NOT_SYMBOL;
+import static me.paultristanwagner.modelchecking.util.Symbol.NOT_SYMBOL;
 
 public class CTLNotFormula extends CTLFormula {
   

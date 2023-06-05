@@ -1,6 +1,6 @@
 package me.paultristanwagner.modelchecking.ltl.formula;
 
-import static me.paultristanwagner.modelchecking.ctl.parse.CTLLexer.NEXT_SYMBOL;
+import static me.paultristanwagner.modelchecking.util.Symbol.NEXT_SYMBOL;
 
 public class LTLNextFormula extends LTLFormula {
 
@@ -10,7 +10,7 @@ public class LTLNextFormula extends LTLFormula {
         this.formula = formula;
     }
 
-    public static LTLFormula of( LTLFormula formula ) {
+    public static LTLNextFormula of( LTLFormula formula ) {
         return new LTLNextFormula( formula );
     }
 

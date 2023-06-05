@@ -1,6 +1,6 @@
 package me.paultristanwagner.modelchecking.ltl.formula;
 
-import static me.paultristanwagner.modelchecking.ctl.parse.CTLLexer.EVENTUALLY_SYMBOL;
+import static me.paultristanwagner.modelchecking.util.Symbol.EVENTUALLY_SYMBOL;
 
 public class LTLEventuallyFormula extends LTLFormula {
 
@@ -10,7 +10,7 @@ private final LTLFormula formula;
         this.formula = formula;
     }
 
-    public static LTLFormula of( LTLFormula formula ) {
+    public static LTLEventuallyFormula of( LTLFormula formula ) {
         return new LTLEventuallyFormula( formula );
     }
 

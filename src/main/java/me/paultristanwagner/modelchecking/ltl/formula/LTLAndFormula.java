@@ -3,7 +3,7 @@ package me.paultristanwagner.modelchecking.ltl.formula;
 import java.util.Arrays;
 import java.util.List;
 
-import static me.paultristanwagner.modelchecking.ctl.parse.CTLLexer.AND_SYMBOL;
+import static me.paultristanwagner.modelchecking.util.Symbol.AND_SYMBOL;
 
 public class LTLAndFormula extends LTLFormula {
 

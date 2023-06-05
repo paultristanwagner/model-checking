@@ -3,7 +3,7 @@ package me.paultristanwagner.modelchecking.ctl.formula.state;
 import java.util.Arrays;
 import java.util.List;
 
-import static me.paultristanwagner.modelchecking.ctl.parse.CTLLexer.AND_SYMBOL;
+import static me.paultristanwagner.modelchecking.util.Symbol.AND_SYMBOL;
 
 public class CTLAndFormula extends CTLFormula {
   

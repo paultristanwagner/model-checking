@@ -2,9 +2,7 @@ package me.paultristanwagner.modelchecking.ctl.parse;
 
 import me.paultristanwagner.modelchecking.ctl.formula.path.*;
 import me.paultristanwagner.modelchecking.ctl.formula.state.*;
-import me.paultristanwagner.modelchecking.parse.Lexer;
-import me.paultristanwagner.modelchecking.parse.Parser;
-import me.paultristanwagner.modelchecking.parse.SyntaxError;
+import me.paultristanwagner.modelchecking.parse.*;
 
 import java.util.ArrayList;
 import java.util.List;

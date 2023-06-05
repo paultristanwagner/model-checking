@@ -2,7 +2,7 @@ package me.paultristanwagner.modelchecking.ctl.formula.path;
 
 import me.paultristanwagner.modelchecking.ctl.formula.state.CTLFormula;
 
-import static me.paultristanwagner.modelchecking.ctl.parse.CTLLexer.UNTIL_SYMBOL;
+import static me.paultristanwagner.modelchecking.util.Symbol.UNTIL_SYMBOL;
 
 public class CTLUntilFormula extends CTLPathFormula {
 

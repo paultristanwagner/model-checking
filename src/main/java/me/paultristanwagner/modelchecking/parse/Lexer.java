@@ -1,8 +1,5 @@
 package me.paultristanwagner.modelchecking.parse;
 
-import me.paultristanwagner.modelchecking.ctl.parse.Token;
-import me.paultristanwagner.modelchecking.ctl.parse.TokenType;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;

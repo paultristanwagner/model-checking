@@ -2,7 +2,7 @@ package me.paultristanwagner.modelchecking.ctl.formula.state;
 
 import me.paultristanwagner.modelchecking.ctl.formula.path.CTLPathFormula;
 
-import static me.paultristanwagner.modelchecking.ctl.parse.CTLLexer.EXISTENTIAL_QUANTIFIER_SYMBOL;
+import static me.paultristanwagner.modelchecking.util.Symbol.EXISTENTIAL_QUANTIFIER_SYMBOL;
 
 public class CTLExistsFormula extends CTLFormula {
   

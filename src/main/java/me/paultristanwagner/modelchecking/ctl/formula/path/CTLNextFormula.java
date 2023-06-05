@@ -3,7 +3,7 @@ package me.paultristanwagner.modelchecking.ctl.formula.path;
 import me.paultristanwagner.modelchecking.ctl.formula.state.CTLFormula;
 import me.paultristanwagner.modelchecking.ctl.formula.state.CTLParenthesisFormula;
 
-import static me.paultristanwagner.modelchecking.ctl.parse.CTLLexer.NEXT_SYMBOL;
+import static me.paultristanwagner.modelchecking.util.Symbol.NEXT_SYMBOL;
 
 public class CTLNextFormula extends CTLPathFormula {
   

@@ -2,7 +2,7 @@ package me.paultristanwagner.modelchecking.ltl.formula;
 
 import java.util.List;
 
-import static me.paultristanwagner.modelchecking.ctl.parse.CTLLexer.OR_SYMBOL;
+import static me.paultristanwagner.modelchecking.util.Symbol.OR_SYMBOL;
 
 public class LTLOrFormula extends LTLFormula {
 

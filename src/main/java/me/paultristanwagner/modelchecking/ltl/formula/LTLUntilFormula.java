@@ -1,6 +1,6 @@
 package me.paultristanwagner.modelchecking.ltl.formula;
 
-import static me.paultristanwagner.modelchecking.ctl.parse.CTLLexer.UNTIL_SYMBOL;
+import static me.paultristanwagner.modelchecking.util.Symbol.UNTIL_SYMBOL;
 
 public class LTLUntilFormula extends LTLFormula {
 
@@ -26,6 +26,6 @@ public class LTLUntilFormula extends LTLFormula {
 
     @Override
     public String toString() {
-        return "(" + left + UNTIL_SYMBOL + right + ")";
+        return "(" + left + " " + UNTIL_SYMBOL + " " + right + ")";
     }
 }

@@ -1,6 +1,6 @@
 package me.paultristanwagner.modelchecking.ltl.formula;
 
-import static me.paultristanwagner.modelchecking.ctl.parse.CTLLexer.ALWAYS_SYMBOL;
+import static me.paultristanwagner.modelchecking.util.Symbol.ALWAYS_SYMBOL;
 
 public class LTLAlwaysFormula extends LTLFormula {
 
@@ -10,7 +10,7 @@ public class LTLAlwaysFormula extends LTLFormula {
         this.formula = formula;
     }
 
-    public static LTLFormula of( LTLFormula formula ) {
+    public static LTLAlwaysFormula of( LTLFormula formula ) {
         return new LTLAlwaysFormula( formula );
     }
 
