@@ -1,5 +1,7 @@
 package me.paultristanwagner.modelchecking.parse;
 
+import static me.paultristanwagner.modelchecking.Main.OUT;
+
 public class SyntaxError extends Error {
 
     private String internalMessage;
@@ -19,12 +21,12 @@ public class SyntaxError extends Error {
     }
 
     public void printWithContext() {
-        System.out.println("Syntax Error: " + getMessage());
-        System.out.println(input);
+        OUT.println("Syntax Error: " + getMessage());
+        OUT.println(input);
         for (int i = 0; i < index; i++) {
-            System.out.print(" ");
+            OUT.print(" ");
         }
-        System.out.println("^");
+        OUT.println("^");
     }
 
     public String getInternalMessage() {

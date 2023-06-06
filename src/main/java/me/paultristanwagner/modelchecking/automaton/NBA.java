@@ -2,8 +2,11 @@ package me.paultristanwagner.modelchecking.automaton;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import me.paultristanwagner.modelchecking.ts.InfinitePath;
 
 import java.util.*;
+
+import static me.paultristanwagner.modelchecking.util.TupleUtil.stringTuple;
 
 public class NBA {
 
@@ -54,13 +57,13 @@ public class NBA {
     private boolean cycleCheck(String s, Set<String> v, Stack<String> xi) {
         xi.push(s);
         v.add(s);
-        while(!xi.isEmpty()) {
+        while (!xi.isEmpty()) {
             String s1 = xi.peek();
             Set<String> successors = getSuccessors(s1);
-            if(successors.contains(s)) {
+            if (successors.contains(s)) {
                 xi.push(s);
                 return true;
-            } else if(!v.containsAll(successors)) {
+            } else if (!v.containsAll(successors)) {
                 Set<String> remainingSuccessors = new HashSet<>(successors);
                 remainingSuccessors.removeAll(v);
 
@@ -83,7 +86,7 @@ public class NBA {
         Stack<String> pi = new Stack<>();
         Stack<String> xi = new Stack<>();
 
-        while(!u.containsAll(initialStates)) {
+        while (!u.containsAll(initialStates)) {
             Set<String> remaining = new HashSet<>(initialStates);
             remaining.removeAll(u);
 
@@ -92,23 +95,23 @@ public class NBA {
 
             pi.push(s0);
 
-            while(!pi.isEmpty()) {
+            while (!pi.isEmpty()) {
                 String s = pi.peek();
 
                 Set<String> remainingSuccessors = new HashSet<>(getSuccessors(s));
                 remainingSuccessors.removeAll(u);
 
-                if(!remainingSuccessors.isEmpty()) {
+                if (!remainingSuccessors.isEmpty()) {
                     String s1 = remainingSuccessors.stream().findAny().get();
                     u.add(s1);
                     pi.push(s1);
                 } else {
                     pi.pop();
-                    if(acceptingStates.contains(s) && cycleCheck(s, v, xi)) {
+                    if (acceptingStates.contains(s) && cycleCheck(s, v, xi)) {
                         List<String> piList = new ArrayList<>(pi);
                         List<String> xiList = new ArrayList<>(xi);
 
-                        NBAEmptinessWitness witness = new NBAEmptinessWitness(piList, xiList);
+                        InfinitePath witness = new InfinitePath(piList, xiList);
                         return NBAEmptinessResult.nonEmpty(witness);
                     }
                 }
@@ -136,26 +139,26 @@ public class NBA {
 
         for (String state1 : states) {
             for (String state2 : other.states) {
-                String state = "(" + state1 + "," + state2 + ")";
+                String state = stringTuple(state1, state2);
                 builder.addState(state);
             }
         }
 
         for (String initialState : initialStates) {
             for (String otherInitialState : other.initialStates) {
-                String state = "(" + initialState + "," + otherInitialState + ")";
+                String state = stringTuple(initialState, otherInitialState);
                 builder.addInitialState(state);
             }
         }
 
         for (NBATransition transition : transitions) {
             for (NBATransition otherTransition : other.transitions) {
-                if(!transition.getAction().equals(otherTransition.getAction())) {
+                if (!transition.getAction().equals(otherTransition.getAction())) {
                     continue;
                 }
 
-                String from = "(" + transition.getFrom() + "," + otherTransition.getFrom() + ")";
-                String to = "(" + transition.getTo() + "," + otherTransition.getTo() + ")";
+                String from = stringTuple(transition.getFrom(), otherTransition.getFrom());
+                String to = stringTuple(transition.getTo(), otherTransition.getTo());
                 builder.addTransition(from, transition.getAction(), to);
             }
         }
@@ -163,7 +166,7 @@ public class NBA {
         Set<String> acceptingSet1 = new HashSet<>();
         for (String acceptingState : acceptingStates) {
             for (String state : other.states) {
-                String newAcceptingState = "(" + acceptingState + "," + state + ")";
+                String newAcceptingState = stringTuple(acceptingState, state);
                 acceptingSet1.add(newAcceptingState);
             }
         }
@@ -171,7 +174,7 @@ public class NBA {
         Set<String> acceptingSet2 = new HashSet<>();
         for (String acceptingState : other.acceptingStates) {
             for (String state : states) {
-                String newAcceptingState = "(" + state + "," + acceptingState + ")";
+                String newAcceptingState = stringTuple(state, acceptingState);
                 acceptingSet2.add(newAcceptingState);
             }
         }

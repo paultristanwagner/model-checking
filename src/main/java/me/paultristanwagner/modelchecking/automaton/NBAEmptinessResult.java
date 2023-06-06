@@ -1,10 +1,12 @@
 package me.paultristanwagner.modelchecking.automaton;
 
+import me.paultristanwagner.modelchecking.ts.InfinitePath;
+
 public final class NBAEmptinessResult {
     private final boolean isEmpty;
-    private final NBAEmptinessWitness witness;
+    private final InfinitePath witness;
 
-    private NBAEmptinessResult(boolean isEmpty, NBAEmptinessWitness witness) {
+    private NBAEmptinessResult(boolean isEmpty, InfinitePath witness) {
         this.isEmpty = isEmpty;
         this.witness = witness;
     }
@@ -13,7 +15,7 @@ public final class NBAEmptinessResult {
         return new NBAEmptinessResult(true, null);
     }
 
-    public static NBAEmptinessResult nonEmpty(NBAEmptinessWitness witness) {
+    public static NBAEmptinessResult nonEmpty(InfinitePath witness) {
         return new NBAEmptinessResult(false, witness);
     }
 
@@ -21,27 +23,7 @@ public final class NBAEmptinessResult {
         return isEmpty;
     }
 
-    public NBAEmptinessWitness witness() {
+    public InfinitePath getWitness() {
         return witness;
-    }
-
-    public String getPathDescription() {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < witness.start().size(); i++) {
-            sb.append(witness.start().get(i));
-            sb.append(" ");
-        }
-
-        sb.append("(");
-        for (int i = 0; i < witness.cycle().size() - 1; i++) {
-            sb.append(witness.cycle().get(i));
-            if(i < witness.cycle().size() - 2) {
-                sb.append(" ");
-            }
-        }
-
-        sb.append(")^ω");
-
-        return sb.toString();
     }
 }

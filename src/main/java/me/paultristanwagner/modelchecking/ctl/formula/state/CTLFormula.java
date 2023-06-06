@@ -1,5 +1,7 @@
 package me.paultristanwagner.modelchecking.ctl.formula.state;
 
-public abstract class CTLFormula {
+import me.paultristanwagner.modelchecking.Formula;
+
+public abstract class CTLFormula  extends Formula {
 
 }

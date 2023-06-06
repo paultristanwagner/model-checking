@@ -1,12 +1,17 @@
 package me.paultristanwagner.modelchecking.ts;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import me.paultristanwagner.modelchecking.automaton.NBA;
 import me.paultristanwagner.modelchecking.automaton.NBATransition;
 import me.paultristanwagner.modelchecking.ts.TSTransition.TSTransitionAdapter;
 
-import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.*;
+
+import static me.paultristanwagner.modelchecking.ts.TSPersistenceResult.notPersistent;
+import static me.paultristanwagner.modelchecking.ts.TSPersistenceResult.persistent;
+import static me.paultristanwagner.modelchecking.util.TupleUtil.stringTuple;
 
 public class TransitionSystem {
 
@@ -61,14 +66,17 @@ public class TransitionSystem {
 
         String q = nbaTransition.getTo();
 
+        // todo: match actions and labels more carefully
         if(!nbaTransition.getAction().equals(label.toString())) {
           continue;
         }
 
-        String resultState = "(" + initialState + "," + q + ")";
+        String resultState = stringTuple(initialState, q);
         builder.addState(resultState);
+        builder.addLabel(resultState, q);
         builder.addInitialState(resultState);
         queue.add(new SimpleEntry<>(initialState, q));
+
       }
     }
 
@@ -88,8 +96,8 @@ public class TransitionSystem {
             Set<String> qSuccessors = nba.getSuccessors(q, sSuccessorLabelString);
             for (String qSuccessor : qSuccessors) {
 
-              String from = "(" + s + "," + q + ")";
-              String to = "(" + sSuccessor + "," + qSuccessor + ")";
+              String from = stringTuple(s, q);
+              String to = stringTuple(sSuccessor, qSuccessor);
 
               builder.addTransition(from, to);
 
@@ -104,6 +112,80 @@ public class TransitionSystem {
     }
 
     return builder.build();
+  }
+
+  private boolean cycleCheck(String s, Set<String> v, Stack<String> xi) {
+    xi.push(s);
+    v.add(s);
+    while(!xi.isEmpty()) {
+      String s1 = xi.peek();
+      List<String> successors = getSuccessors(s1);
+      if(successors.contains(s)) {
+        xi.push(s);
+        return true;
+      } else if(!v.containsAll(successors)) {
+        Set<String> remainingSuccessors = new HashSet<>(successors);
+        remainingSuccessors.removeAll(v);
+
+        String s2 = remainingSuccessors.stream().findAny().get();
+        v.add(s2);
+        xi.push(s2);
+      } else {
+        xi.pop();
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * @return whether the ts satisfies the persistence property 'eventually always P'
+   */
+  public TSPersistenceResult checkPersistence(Set<String> persistentStates) {
+    // run a nested-depth-first-search
+    Set<String> u = new HashSet<>();
+    Set<String> v = new HashSet<>();
+
+    Stack<String> pi = new Stack<>();
+    Stack<String> xi = new Stack<>();
+
+    while(!u.containsAll(initialStates)) {
+      Set<String> remaining = new HashSet<>(initialStates);
+      remaining.removeAll(u);
+
+      String s0 = remaining.stream().findAny().get();
+      u.add(s0);
+
+      pi.push(s0);
+
+      while(!pi.isEmpty()) {
+        String s = pi.peek();
+
+        Set<String> remainingSuccessors = new HashSet<>(getSuccessors(s));
+        remainingSuccessors.removeAll(u);
+
+        if(!remainingSuccessors.isEmpty()) {
+          String s1 = remainingSuccessors.stream().findAny().get();
+          u.add(s1);
+          pi.push(s1);
+        } else {
+          pi.pop();
+          List<String> labels = labelingFunction.get(s);
+
+          boolean notPersistentState = labels.stream().noneMatch(persistentStates::contains);
+
+          if(notPersistentState && cycleCheck(s, v, xi)) {
+            List<String> piList = new ArrayList<>(pi);
+            List<String> xiList = new ArrayList<>(xi);
+
+            InfinitePath witness = new InfinitePath(piList, xiList);
+            return notPersistent(witness);
+          }
+        }
+      }
+    }
+
+    return persistent();
   }
 
   @Override
@@ -125,6 +207,10 @@ public class TransitionSystem {
         .filter(transition -> transition.getFrom().equals(state))
         .map(TSTransition::getTo)
         .toList();
+  }
+
+  public List<String> getAtomicPropositions() {
+    return atomicPropositions;
   }
 
   public List<String> getLabel(String state) {

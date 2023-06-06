@@ -45,6 +45,8 @@ Example: See examples/ts0.json
 }
 ```
 
+<img src="images/ts0.png" alt="Transition system defined in examples/ts0.json" width="500" /> <br>
+
 ### Load a transition system from a file
 To load a transition system from a file, enter the path to the file in the command line. <br>
 Example: <br>
@@ -64,31 +66,44 @@ Example CTL formulas:
 - ∀◇(error) - "For all possible ways the system can evolve, there exists a way to reach an error state"
 - ∀□(∃◇(reset)) - "For all possible ways the system can evolve, it is always possible to reset the system"
 
+## Model checking of LTL and CTL formulas
+In this project, model checking algorithms for LTL as well as CTL formulas are implemented.
+A simple parser is used to parse LTL and CTL formulas based on a flexible grammar.
+
+### Examples of LTL model checking
+We can check LTL properties for the previously shown transition system defined in ``examples/ts0.json``: <br>
+
+φ := □(a) - "The system is always in a state where a is true" <br>
+<img src="images/always_a.png" alt="□(a)" width="500" /> <br>
+Explanation: The formula does not hold for the transition system because there exists a path starting in s0 that leads to s4 where a is already initially false.
+
+φ := ◇(b) - "At some point in the future, the system will be in a state where b is true" <br>
+<img src="images/eventually_b.png" alt="◇(b)" width="500" /> <br>
+Explanation: The formula holds for the transition system because every path of the transition system must visit either s3 or s4.
+
+φ := ◇□(a) - "From some point in the future, the system will always be in a state where a is true" <br>
+<img src="images/eventually_always_a.png" alt="◇□(a)" width="500" /> <br>
+Explanation: The formula does not hold for the transition system because there exists a path starting in s0 that leads to s4 where it stays forever. And a does not hold in s4.
+
+### Examples of CTL model checking
+We can check CTL properties for the previously shown transition system defined in ``examples/ts0.json``: <br>
+
+Φ := ∀◊(b) - "For all possible ways the system can evolve, there exists a way to reach a state where b is true" <br>
+<img src="images/all_eventually_b.png" alt="∀◊(b)" width="500" /> <br>
+Explanation: The formula holds for the transition system because every path in the transition system must visit either s3 or s4.
+
+Φ := ∀◯(¬a) - "For all possible ways the system can evolve the next state will not be a"
+<img src="images/all_next_not_a.png" alt="∀◯(¬a)" width="500" /> <br>
+Explanation: The formula does not hold for the transition system because there exists a path starting in s0 that leads to s1 where a is true.
+
+Φ := ∀□(∃◊(¬a ∧ ¬b)) - "For all possible ways the system can evolve, it is always possible to reach a state where a and b are false" <br>
+<img src="images/all_always_ex_eventually_reset.png" alt="∀□(∃◊(¬a ∧ ¬b))" width="500" /> <br>
+Explanation: The formula does not hold for the transition system because for the path starting in s0 going to s4, it is not possible anymore to reach a state where a and b are false.
+
 ## Comparison of LTL and CTL
 CTL and LTL have distinct characteristics and expressiveness, making them incomparable in terms of their expressive power. CTL focuses on reasoning about paths in a computation tree and allows for the specification of temporal properties that hold on all or some of the paths. On the other hand, LTL deals with linear sequences of states and enables the specification of temporal properties that hold along all possible executions. Although they serve different purposes, CTL and LTL can complement each other in the context of model checking, as they provide different perspectives and approaches to reasoning about temporal properties in concurrent systems.
 
 The computational complexity of model checking for Linear Temporal Logic (LTL) and Computation Tree Logic (CTL) differs, with LTL model checking being PSPACE-complete and CTL model checking being PTIME-complete. While it might seem that CTL model checking is more efficient due to its PTIME complexity, it is important to note that the length of the formula plays a significant role. In many cases, LTL formulas can be exponentially shorter than their CTL equivalents. This means that even though CTL model checking has a better complexity class, the actual runtime can be influenced by the size of the formula. Therefore, the efficiency of model checking depends not only on the computational complexity class but also on the specific properties being checked and the lengths of the corresponding formulas in LTL and CTL.
-
-## Model checking of CTL formulas
-In this project, the model checking algorithm for CTL formulas is implemented.
-A simple parser is used to parse CTL formulas based on a flexible grammar.
-
-### Examples of CTL model checking
-We can check CTL properties for the following transition system defined in ``examples/ts0.json``: <br>
-
-<img src="images/ts0.png" alt="Transition system defined in examples/ts0.json" width="500" /> <br>
-
-ϕ := ∀◊(b) - "For all possible ways the system can evolve, there exists a way to reach a state where b is true" <br>
-<img src="images/all_eventually_b.png" alt="∀◊(b)" width="500" /> <br>
-Explanation: The formula holds for the transition system because every path in the transition system must visit either s3 or s4.
-
-ϕ := ∀◯(¬a) - "For all possible ways the system can evolve the next state will not be a"
-<img src="images/all_next_not_a.png" alt="∀◯(¬a)" width="500" /> <br>
-Explanation: The formula does not hold for the transition system because there exists a path starting in s0 that leads to s1 where a is true.
-
-ϕ := ∀□(∃◊(¬a ∧ ¬b)) - "For all possible ways the system can evolve, it is always possible to reach a state where a and b are false" <br>
-<img src="images/all_always_ex_eventually_reset.png" alt="∀□(∃◊(¬a ∧ ¬b))" width="500" /> <br>
-Explanation: The formula does not hold for the transition system because for the path starting in s0 going to s4, it is not possible anymore to reach a state where a and b are false.
 
 ## Contributing
 Thank you for your interest in contributing to this project! Contributions are welcome and greatly appreciated. 
@@ -97,11 +112,8 @@ Thank you for your interest in contributing to this project! Contributions are w
 If you have any feedback or encounter any issues, please open an issue on GitHub or E-Mail me at: [paultristanwagner@gmail.com](mailto:paultristanwagner@gmail.com).
 
 ## Ideas for future work
+- Write tests for the CTL and LTL model checking algorithms
 - Optimize the lookup of the next states in the transition system
 - Implement linear-time fixpoint computation in CTL model checking
-- Implication and equivalence operators in CTL grammar
-- Write tests for the CTL model checking algorithm
-- Büchi automaton
-- Parser for LTL formulas
+- Implication and equivalence operators in CTL and LTL grammar
 - Parser for ω-regular expressions
-- Implement model checking for LTL formulas

@@ -1,5 +1,9 @@
 package me.paultristanwagner.modelchecking.ltl.formula;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 public class LTLParenthesisFormula extends LTLFormula {
 
     private final LTLFormula formula;
@@ -10,6 +14,14 @@ public class LTLParenthesisFormula extends LTLFormula {
 
     public static LTLParenthesisFormula parenthesis(LTLFormula formula ) {
         return new LTLParenthesisFormula( formula );
+    }
+
+    @Override
+    public List<LTLFormula> getAllSubformulas() {
+        List<LTLFormula> subformulas = new ArrayList<>();
+        subformulas.add( this );
+        subformulas.addAll( formula.getAllSubformulas() );
+        return subformulas;
     }
 
     public LTLFormula getFormula() {
@@ -23,5 +35,15 @@ public class LTLParenthesisFormula extends LTLFormula {
         }
 
         return "(" + formula + ")";
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof LTLParenthesisFormula parenthesisFormula && formula.equals(parenthesisFormula.formula);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(formula);
     }
 }

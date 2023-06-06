@@ -12,16 +12,25 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import static me.paultristanwagner.modelchecking.ctl.CTLModelCheckingResult.doesNotModel;
+import static me.paultristanwagner.modelchecking.ctl.CTLModelCheckingResult.models;
+
 public class BasicCTLModelChecker implements CTLModelChecker {
 
     @Override
-    public boolean check(TransitionSystem ts, CTLFormula formula) {
+    public CTLModelCheckingResult check(TransitionSystem ts, CTLFormula formula) {
         CTLENFConverter converter = new CTLENFConverter();
         CTLFormula enfFormula = converter.convert(formula);
 
         Set<String> satStates = sat(ts, enfFormula);
 
-        return satStates.containsAll(ts.getInitialStates());
+        boolean models = satStates.containsAll(ts.getInitialStates());
+
+        if (models) {
+            return models();
+        } else {
+            return doesNotModel();
+        }
     }
 
     private Set<String> sat(TransitionSystem ts, CTLFormula formula) {

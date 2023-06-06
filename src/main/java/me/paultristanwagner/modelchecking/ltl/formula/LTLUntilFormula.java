@@ -1,5 +1,9 @@
 package me.paultristanwagner.modelchecking.ltl.formula;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 import static me.paultristanwagner.modelchecking.util.Symbol.UNTIL_SYMBOL;
 
 public class LTLUntilFormula extends LTLFormula {
@@ -16,6 +20,15 @@ public class LTLUntilFormula extends LTLFormula {
         return new LTLUntilFormula( left, right );
     }
 
+    @Override
+    public List<LTLFormula> getAllSubformulas() {
+        List<LTLFormula> subformulas = new ArrayList<>();
+        subformulas.add( this );
+        subformulas.addAll( left.getAllSubformulas() );
+        subformulas.addAll( right.getAllSubformulas() );
+        return subformulas;
+    }
+
     public LTLFormula getLeft() {
         return left;
     }
@@ -27,5 +40,15 @@ public class LTLUntilFormula extends LTLFormula {
     @Override
     public String toString() {
         return "(" + left + " " + UNTIL_SYMBOL + " " + right + ")";
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof LTLUntilFormula untilFormula && left.equals(untilFormula.left) && right.equals(untilFormula.right);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(left, right);
     }
 }

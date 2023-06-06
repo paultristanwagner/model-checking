@@ -1,5 +1,9 @@
 package me.paultristanwagner.modelchecking.ltl.formula;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 public class LTLIdentifierFormula extends LTLFormula {
 
     private final String identifier;
@@ -12,6 +16,13 @@ public class LTLIdentifierFormula extends LTLFormula {
         return new LTLIdentifierFormula( identifier );
     }
 
+    @Override
+    public List<LTLFormula> getAllSubformulas() {
+        List<LTLFormula> subformulas = new ArrayList<>();
+        subformulas.add( this );
+        return subformulas;
+    }
+
     public String getIdentifier() {
         return identifier;
     }
@@ -19,5 +30,15 @@ public class LTLIdentifierFormula extends LTLFormula {
     @Override
     public String toString() {
         return identifier;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof LTLIdentifierFormula identifierFormula && identifier.equals(identifierFormula.identifier);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(identifier);
     }
 }
