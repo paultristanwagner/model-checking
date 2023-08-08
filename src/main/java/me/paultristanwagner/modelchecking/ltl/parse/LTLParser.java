@@ -1,15 +1,5 @@
 package me.paultristanwagner.modelchecking.ltl.parse;
 
-import me.paultristanwagner.modelchecking.ltl.formula.*;
-import me.paultristanwagner.modelchecking.parse.Parser;
-import me.paultristanwagner.modelchecking.parse.SyntaxError;
-import me.paultristanwagner.modelchecking.parse.Token;
-import me.paultristanwagner.modelchecking.parse.TokenType;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import static me.paultristanwagner.modelchecking.ltl.formula.LTLAlwaysFormula.always;
 import static me.paultristanwagner.modelchecking.ltl.formula.LTLAndFormula.and;
 import static me.paultristanwagner.modelchecking.ltl.formula.LTLEventuallyFormula.eventually;
@@ -33,6 +23,15 @@ import static me.paultristanwagner.modelchecking.ltl.parse.LTLLexer.OR;
 import static me.paultristanwagner.modelchecking.ltl.parse.LTLLexer.RPAREN;
 import static me.paultristanwagner.modelchecking.ltl.parse.LTLLexer.TRUE;
 import static me.paultristanwagner.modelchecking.ltl.parse.LTLLexer.UNTIL;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import me.paultristanwagner.modelchecking.ltl.formula.*;
+import me.paultristanwagner.modelchecking.parse.Parser;
+import me.paultristanwagner.modelchecking.parse.SyntaxError;
+import me.paultristanwagner.modelchecking.parse.Token;
+import me.paultristanwagner.modelchecking.parse.TokenType;
 
 public class LTLParser implements Parser<LTLFormula> {
 
@@ -62,15 +61,11 @@ public class LTLParser implements Parser<LTLFormula> {
     public LTLFormula parse(String input, AtomicInteger index) {
         LTLLexer lexer = new LTLLexer(input);
 
-        if (!lexer.hasNextToken()) {
-            throw new SyntaxError("Unexpected end of input", input, index.get());
-        }
+        lexer.requireNextToken();
 
         LTLFormula formula = parseLTLFormula(lexer);
-        if (lexer.hasNextToken()) {
-            Token token = lexer.getLookahead();
-            throw new SyntaxError("Unexpected token " + token.getType().getName(), lexer.getInput(), lexer.getCursor() - token.getValue().length());
-        }
+
+        lexer.requireNoToken();
 
         return formula;
     }
@@ -126,6 +121,8 @@ public class LTLParser implements Parser<LTLFormula> {
     }
 
     private LTLFormula D(LTLLexer lexer) {
+        lexer.requireNextToken();
+
         Token lookahead = lexer.getLookahead();
         TokenType type = lookahead.getType();
 
@@ -145,9 +142,9 @@ public class LTLParser implements Parser<LTLFormula> {
             return parseParenthesis(lexer);
         } else if (type == IDENTIFIER) {
             return parseIdentifier(lexer);
-        } else {
-            throw new SyntaxError("Unexpected token " + type.getName(), lexer.getInput(), lexer.getCursor() - lookahead.getValue().length());
         }
+
+        throw new SyntaxError("Unexpected token " + type.getName(), lexer.getInput(), lexer.getTokenStart());
     }
 
     private LTLNotFormula parseNot(LTLLexer lexer) {

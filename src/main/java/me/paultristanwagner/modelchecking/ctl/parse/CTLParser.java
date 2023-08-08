@@ -1,14 +1,13 @@
 package me.paultristanwagner.modelchecking.ctl.parse;
 
-import me.paultristanwagner.modelchecking.ctl.formula.path.*;
-import me.paultristanwagner.modelchecking.ctl.formula.state.*;
-import me.paultristanwagner.modelchecking.parse.*;
+import static me.paultristanwagner.modelchecking.ctl.parse.CTLLexer.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static me.paultristanwagner.modelchecking.ctl.parse.CTLLexer.*;
+import me.paultristanwagner.modelchecking.ctl.formula.path.*;
+import me.paultristanwagner.modelchecking.ctl.formula.state.*;
+import me.paultristanwagner.modelchecking.parse.*;
 
 public class CTLParser implements Parser<CTLFormula> {
 
@@ -32,6 +31,7 @@ public class CTLParser implements Parser<CTLFormula> {
    *    PATH ::= NEXT <A>
    *         | ALWAYS <A>
    *         | EVENTUALLY <A>
+   *         | '(' <A> ')' UNTIL <A>
    *         | '(' <A> UNTIL <A> ')'
    *         | <A> UNTIL <A>
    *
@@ -41,16 +41,12 @@ public class CTLParser implements Parser<CTLFormula> {
   public CTLFormula parse(String input, AtomicInteger index) {
     CTLLexer lexer = new CTLLexer(input);
 
-    if(!lexer.hasNextToken()) {
-      throw new SyntaxError("Unexpected end of input", input, index.get());
-    }
+    lexer.requireNextToken();
 
     CTLFormula formula = parseStateFormula(lexer);
-    if(lexer.hasNextToken()) {
-      Token token = lexer.getLookahead();
-      throw new SyntaxError("Unexpected token " + token.getType().getName(), lexer.getInput(), lexer.getCursor() - token.getValue().length());
-    }
-    
+
+    lexer.requireNoToken();
+
     return formula;
   }
 
@@ -93,6 +89,8 @@ public class CTLParser implements Parser<CTLFormula> {
   }
 
   private CTLFormula C( Lexer lexer) {
+    lexer.requireNextToken();
+
     Token token = lexer.getLookahead();
     TokenType tokenType = token.getType();
 
@@ -164,6 +162,8 @@ public class CTLParser implements Parser<CTLFormula> {
   }
 
   private CTLPathFormula parsePathFormula( Lexer lexer) {
+    lexer.requireNextToken();
+
     Token lookahead = lexer.getLookahead();
     TokenType type = lookahead.getType();
     if ( type.equals( NEXT ) ) {
@@ -173,12 +173,9 @@ public class CTLParser implements Parser<CTLFormula> {
     } else if ( type.equals( ALWAYS ) ) {
       return parseAlwaysFormula( lexer );
     } else if( type.equals( LPAREN )) {
-      lexer.consume( LPAREN );
-      CTLUntilFormula untilFormula = parseUntilFormula( lexer );
-      lexer.consume( RPAREN );
-      return untilFormula;
+      return parseParenthesisUntilFormula( lexer );
     }
-    
+
     return parseUntilFormula( lexer );
   }
 
@@ -190,6 +187,12 @@ public class CTLParser implements Parser<CTLFormula> {
   }
 
   private CTLUntilFormula parseUntilFormula( Lexer lexer) {
+    lexer.requireNextToken();
+
+    if(lexer.getLookahead().getType() == LPAREN) {
+      return parseParenthesisUntilFormula(lexer);
+    }
+
     CTLFormula left = parseStateFormula(lexer);
 
     lexer.consume(UNTIL);
@@ -198,17 +201,39 @@ public class CTLParser implements Parser<CTLFormula> {
 
     return CTLUntilFormula.until(left, right);
   }
-  
+
+  private CTLUntilFormula parseParenthesisUntilFormula( Lexer lexer ) {
+    lexer.consume(LPAREN);
+    CTLFormula left = parseStateFormula(lexer);
+    CTLFormula right;
+
+    lexer.requireNextToken();
+
+    if(lexer.getLookahead().getType() == RPAREN) {
+      lexer.consume(RPAREN);
+      left = CTLParenthesisFormula.parenthesis(left);
+
+      lexer.consume(UNTIL);
+      right = parseStateFormula(lexer);
+    } else {
+      lexer.consume(UNTIL);
+      right = parseStateFormula(lexer);
+      lexer.consume(RPAREN);
+    }
+
+    return CTLUntilFormula.until(left, right);
+  }
+
   private CTLEventuallyFormula parseEventuallyFormula( Lexer lexer) {
     lexer.consume( EVENTUALLY );
-    
+
     CTLFormula stateFormula = parseStateFormula( lexer );
     return CTLEventuallyFormula.eventually(stateFormula);
   }
-  
+
   private CTLAlwaysFormula parseAlwaysFormula( Lexer lexer) {
     lexer.consume( ALWAYS );
-    
+
     CTLFormula stateFormula = parseStateFormula( lexer );
     return CTLAlwaysFormula.always(stateFormula);
   }

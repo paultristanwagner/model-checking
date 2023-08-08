@@ -67,6 +67,10 @@ public abstract class Lexer {
   }
 
   public void consume(TokenType token) {
+    if(lookahead == null) {
+      throw new SyntaxError("Expected token '" + token.getName() + "'", input, cursor);
+    }
+
     if (lookahead.getType() != token) {
       throw new SyntaxError("Expected token '" + token.getName() + "' but got token '" + lookahead.getType().getName() + "'", input, cursor - lookahead.getValue().length());
     }
@@ -88,5 +92,21 @@ public abstract class Lexer {
 
   public boolean hasNextToken() {
     return lookahead != null;
+  }
+
+  public void requireNextToken() {
+    if(!hasNextToken()) {
+      throw new SyntaxError("Unexpected end of input", input, cursor);
+    }
+  }
+
+  public void requireNoToken() {
+    if(hasNextToken()) {
+      throw new SyntaxError("Unexpected token " + lookahead.getType().getName(), input, cursor - lookahead.getValue().length());
+    }
+  }
+
+  public int getTokenStart() {
+    return cursor - lookahead.getValue().length();
   }
 }
