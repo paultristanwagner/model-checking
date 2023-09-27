@@ -7,66 +7,66 @@ import java.util.List;
 
 public record InfinitePath(List<String> start, List<String> cycle) {
 
-    private static final String TUPLE_PREFIX = "(";
-    private static final String TUPLE_SUFFIX = ")";
-    private static final String TUPLE_SEPARATOR = ",";
+  private static final String TUPLE_PREFIX = "(";
+  private static final String TUPLE_SUFFIX = ")";
+  private static final String TUPLE_SEPARATOR = ",";
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        for (String s : start) {
-            sb.append(s)
-                    .append(" ");
-        }
-
-        sb.append("(");
-        for (int i = 0; i < cycle.size() - 1; i++) {
-            String s = cycle.get(i);
-            sb.append(s);
-
-            if (i < cycle.size() - 2) {
-                sb.append(" ");
-            }
-        }
-        sb.append(")^");
-        sb.append(LOWERCASE_OMEGA);
-
-        return sb.toString();
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    for (String s : start) {
+      sb.append(s).append(" ");
     }
 
-    public InfinitePath reduce() {
-        for (String s : start) {
-            if (!s.startsWith(TUPLE_PREFIX) || !s.endsWith(TUPLE_SUFFIX)) {
-                return this;
-            }
-        }
+    sb.append("(");
+    for (int i = 0; i < cycle.size() - 1; i++) {
+      String s = cycle.get(i);
+      sb.append(s);
 
-        for (String s : cycle) {
-            if (!s.startsWith(TUPLE_PREFIX) || !s.endsWith(TUPLE_SUFFIX)) {
-                return this;
-            }
-        }
+      if (i < cycle.size() - 2) {
+        sb.append(" ");
+      }
+    }
+    sb.append(")^");
+    sb.append(LOWERCASE_OMEGA);
 
-        List<String> transformedStart = transformList(start);
-        List<String> transformedCycle = transformList(cycle);
+    return sb.toString();
+  }
 
-        return new InfinitePath(transformedStart, transformedCycle);
+  public InfinitePath reduce() {
+    for (String s : start) {
+      if (!s.startsWith(TUPLE_PREFIX) || !s.endsWith(TUPLE_SUFFIX)) {
+        return this;
+      }
     }
 
-    private List<String> transformList(List<String> list) {
-        List<String> transformed = new ArrayList<>();
-        for (String s : list) {
-            transformed.add(transformTuple(s));
-        }
-
-        return transformed;
+    for (String s : cycle) {
+      if (!s.startsWith(TUPLE_PREFIX) || !s.endsWith(TUPLE_SUFFIX)) {
+        return this;
+      }
     }
 
-    private String transformTuple(String tupleString) {
-        String removedPrefix = tupleString.substring(TUPLE_PREFIX.length());
-        String removedSuffix = removedPrefix.substring(0, removedPrefix.length() - TUPLE_SUFFIX.length());
-        String[] split = removedSuffix.split(TUPLE_SEPARATOR);
+    List<String> transformedStart = transformList(start);
+    List<String> transformedCycle = transformList(cycle);
 
-        return split[0];
+    return new InfinitePath(transformedStart, transformedCycle);
+  }
+
+  private List<String> transformList(List<String> list) {
+    List<String> transformed = new ArrayList<>();
+    for (String s : list) {
+      transformed.add(transformTuple(s));
     }
+
+    return transformed;
+  }
+
+  private String transformTuple(String tupleString) {
+    String removedPrefix = tupleString.substring(TUPLE_PREFIX.length());
+    String removedSuffix =
+        removedPrefix.substring(0, removedPrefix.length() - TUPLE_SUFFIX.length());
+    String[] split = removedSuffix.split(TUPLE_SEPARATOR);
+
+    return split[0];
+  }
 }

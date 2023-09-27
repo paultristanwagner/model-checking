@@ -6,24 +6,24 @@ import me.paultristanwagner.modelchecking.ctl.formula.state.CTLFormula;
 import me.paultristanwagner.modelchecking.ctl.formula.state.CTLParenthesisFormula;
 
 public class CTLNextFormula extends CTLPathFormula {
-  
+
   private final CTLFormula stateFormula;
-  
-  private CTLNextFormula( CTLFormula stateFormula ) {
+
+  private CTLNextFormula(CTLFormula stateFormula) {
     this.stateFormula = stateFormula;
   }
-  
-  public static CTLNextFormula next(CTLFormula stateFormula ) {
-    return new CTLNextFormula( stateFormula );
+
+  public static CTLNextFormula next(CTLFormula stateFormula) {
+    return new CTLNextFormula(stateFormula);
   }
-  
+
   public CTLFormula getStateFormula() {
     return stateFormula;
   }
-  
+
   @Override
   public String toString() {
-    if(stateFormula instanceof CTLParenthesisFormula ) {
+    if (stateFormula instanceof CTLParenthesisFormula) {
       return NEXT_SYMBOL + stateFormula;
     } else {
       return NEXT_SYMBOL + "(" + stateFormula + ")";
