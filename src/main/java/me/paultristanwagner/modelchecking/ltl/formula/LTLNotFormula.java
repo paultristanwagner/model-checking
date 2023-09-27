@@ -1,10 +1,10 @@
 package me.paultristanwagner.modelchecking.ltl.formula;
 
+import static me.paultristanwagner.modelchecking.util.Symbol.NOT_SYMBOL;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import static me.paultristanwagner.modelchecking.util.Symbol.NOT_SYMBOL;
 
 public class LTLNotFormula extends LTLFormula {
 

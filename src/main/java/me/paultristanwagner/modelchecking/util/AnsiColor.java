@@ -13,7 +13,7 @@ public enum AnsiColor {
 
   private final String code;
 
-  AnsiColor( String code) {
+  AnsiColor(String code) {
     this.code = code;
   }
 

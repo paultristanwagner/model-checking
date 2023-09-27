@@ -29,7 +29,9 @@ public class TSTransition {
 
     @Override
     public JsonElement serialize(
-            TSTransition transition, java.lang.reflect.Type typeOfSrc, JsonSerializationContext context) {
+        TSTransition transition,
+        java.lang.reflect.Type typeOfSrc,
+        JsonSerializationContext context) {
       JsonArray jsonArray = new JsonArray();
       jsonArray.add(transition.getFrom());
       jsonArray.add(transition.getTo());

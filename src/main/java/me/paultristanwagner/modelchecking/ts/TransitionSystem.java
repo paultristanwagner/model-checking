@@ -1,24 +1,24 @@
 package me.paultristanwagner.modelchecking.ts;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import me.paultristanwagner.modelchecking.automaton.NBA;
-import me.paultristanwagner.modelchecking.automaton.NBATransition;
-import me.paultristanwagner.modelchecking.ts.TSTransition.TSTransitionAdapter;
-
-import java.util.AbstractMap.SimpleEntry;
-import java.util.*;
-
 import static me.paultristanwagner.modelchecking.ts.TSPersistenceResult.notPersistent;
 import static me.paultristanwagner.modelchecking.ts.TSPersistenceResult.persistent;
 import static me.paultristanwagner.modelchecking.util.TupleUtil.stringTuple;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import java.util.*;
+import java.util.AbstractMap.SimpleEntry;
+import me.paultristanwagner.modelchecking.automaton.NBA;
+import me.paultristanwagner.modelchecking.automaton.NBATransition;
+import me.paultristanwagner.modelchecking.ts.TSTransition.TSTransitionAdapter;
 
 public class TransitionSystem {
 
   private static final Gson GSON;
 
   static {
-    GSON = new GsonBuilder()
+    GSON =
+        new GsonBuilder()
             .registerTypeAdapter(TSTransition.class, new TSTransitionAdapter())
             .setPrettyPrinting()
             .create();
@@ -58,16 +58,16 @@ public class TransitionSystem {
     for (String initialState : initialStates) {
       List<String> label = labelingFunction.get(initialState);
 
-      for(NBATransition nbaTransition : nba.getTransitions()) {
+      for (NBATransition nbaTransition : nba.getTransitions()) {
         String q0 = nbaTransition.getFrom();
-        if(!nba.getInitialStates().contains(q0)) {
+        if (!nba.getInitialStates().contains(q0)) {
           continue;
         }
 
         String q = nbaTransition.getTo();
 
         // todo: match actions and labels more carefully
-        if(!nbaTransition.getAction().equals(label.toString())) {
+        if (!nbaTransition.getAction().equals(label.toString())) {
           continue;
         }
 
@@ -76,7 +76,6 @@ public class TransitionSystem {
         builder.addLabel(resultState, q);
         builder.addInitialState(resultState);
         queue.add(new SimpleEntry<>(initialState, q));
-
       }
     }
 
@@ -90,25 +89,25 @@ public class TransitionSystem {
       String q = state.getValue();
       List<String> sSuccessors = getSuccessors(s);
 
-        for (String sSuccessor : sSuccessors) {
-            List<String> sSuccessorLabel = labelingFunction.get(sSuccessor);
-            String sSuccessorLabelString = sSuccessorLabel.toString();
-            Set<String> qSuccessors = nba.getSuccessors(q, sSuccessorLabelString);
-            for (String qSuccessor : qSuccessors) {
+      for (String sSuccessor : sSuccessors) {
+        List<String> sSuccessorLabel = labelingFunction.get(sSuccessor);
+        String sSuccessorLabelString = sSuccessorLabel.toString();
+        Set<String> qSuccessors = nba.getSuccessors(q, sSuccessorLabelString);
+        for (String qSuccessor : qSuccessors) {
 
-              String from = stringTuple(s, q);
-              String to = stringTuple(sSuccessor, qSuccessor);
+          String from = stringTuple(s, q);
+          String to = stringTuple(sSuccessor, qSuccessor);
 
-              builder.addTransition(from, to);
+          builder.addTransition(from, to);
 
-              SimpleEntry<String, String> successor = new SimpleEntry<>(sSuccessor, qSuccessor);
-              if(!visited.contains(successor)) {
-                queue.add(successor);
-                builder.addState(to);
-                builder.addLabel(to, qSuccessor);
-              }
-            }
+          SimpleEntry<String, String> successor = new SimpleEntry<>(sSuccessor, qSuccessor);
+          if (!visited.contains(successor)) {
+            queue.add(successor);
+            builder.addState(to);
+            builder.addLabel(to, qSuccessor);
+          }
         }
+      }
     }
 
     return builder.build();
@@ -117,13 +116,13 @@ public class TransitionSystem {
   private boolean cycleCheck(String s, Set<String> v, Stack<String> xi) {
     xi.push(s);
     v.add(s);
-    while(!xi.isEmpty()) {
+    while (!xi.isEmpty()) {
       String s1 = xi.peek();
       List<String> successors = getSuccessors(s1);
-      if(successors.contains(s)) {
+      if (successors.contains(s)) {
         xi.push(s);
         return true;
-      } else if(!v.containsAll(successors)) {
+      } else if (!v.containsAll(successors)) {
         Set<String> remainingSuccessors = new HashSet<>(successors);
         remainingSuccessors.removeAll(v);
 
@@ -149,7 +148,7 @@ public class TransitionSystem {
     Stack<String> pi = new Stack<>();
     Stack<String> xi = new Stack<>();
 
-    while(!u.containsAll(initialStates)) {
+    while (!u.containsAll(initialStates)) {
       Set<String> remaining = new HashSet<>(initialStates);
       remaining.removeAll(u);
 
@@ -158,13 +157,13 @@ public class TransitionSystem {
 
       pi.push(s0);
 
-      while(!pi.isEmpty()) {
+      while (!pi.isEmpty()) {
         String s = pi.peek();
 
         Set<String> remainingSuccessors = new HashSet<>(getSuccessors(s));
         remainingSuccessors.removeAll(u);
 
-        if(!remainingSuccessors.isEmpty()) {
+        if (!remainingSuccessors.isEmpty()) {
           String s1 = remainingSuccessors.stream().findAny().get();
           u.add(s1);
           pi.push(s1);
@@ -174,7 +173,7 @@ public class TransitionSystem {
 
           boolean notPersistentState = labels.stream().noneMatch(persistentStates::contains);
 
-          if(notPersistentState && cycleCheck(s, v, xi)) {
+          if (notPersistentState && cycleCheck(s, v, xi)) {
             List<String> piList = new ArrayList<>(pi);
             List<String> xiList = new ArrayList<>(xi);
 
@@ -222,6 +221,6 @@ public class TransitionSystem {
   }
 
   public static TransitionSystem fromJson(String string) {
-    return GSON.fromJson( string, TransitionSystem.class );
+    return GSON.fromJson(string, TransitionSystem.class);
   }
 }

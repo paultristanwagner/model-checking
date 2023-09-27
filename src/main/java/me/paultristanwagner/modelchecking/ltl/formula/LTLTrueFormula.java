@@ -6,32 +6,31 @@ import java.util.Objects;
 
 public class LTLTrueFormula extends LTLFormula {
 
-    private LTLTrueFormula() {
-    }
+  private LTLTrueFormula() {}
 
-    public static LTLTrueFormula TRUE() {
-        return new LTLTrueFormula();
-    }
+  public static LTLTrueFormula TRUE() {
+    return new LTLTrueFormula();
+  }
 
-    @Override
-    public List<LTLFormula> getAllSubformulas() {
-        List<LTLFormula> subformulas = new ArrayList<>();
-        subformulas.add(this);
-        return subformulas;
-    }
+  @Override
+  public List<LTLFormula> getAllSubformulas() {
+    List<LTLFormula> subformulas = new ArrayList<>();
+    subformulas.add(this);
+    return subformulas;
+  }
 
-    @Override
-    public String toString() {
-        return "true";
-    }
+  @Override
+  public String toString() {
+    return "true";
+  }
 
-    @Override
-    public boolean equals(Object obj) {
-        return obj instanceof LTLTrueFormula;
-    }
+  @Override
+  public boolean equals(Object obj) {
+    return obj instanceof LTLTrueFormula;
+  }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(true);
-    }
+  @Override
+  public int hashCode() {
+    return Objects.hash(true);
+  }
 }

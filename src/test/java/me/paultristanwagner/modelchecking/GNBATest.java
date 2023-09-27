@@ -1,13 +1,12 @@
 package me.paultristanwagner.modelchecking;
 
+import java.io.IOException;
+import java.io.InputStream;
 import me.paultristanwagner.modelchecking.automaton.GNBA;
 import me.paultristanwagner.modelchecking.automaton.NBA;
 import me.paultristanwagner.modelchecking.automaton.NBAEmptinessResult;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
-import java.io.InputStream;
 
 public class GNBATest {
 

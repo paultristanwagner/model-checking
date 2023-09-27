@@ -2,8 +2,7 @@ package me.paultristanwagner.modelchecking.ctl.formula.state;
 
 public class CTLFalseFormula extends CTLFormula {
 
-  private CTLFalseFormula() {
-  }
+  private CTLFalseFormula() {}
 
   public static CTLFalseFormula FALSE() {
     return new CTLFalseFormula();

@@ -1,9 +1,9 @@
 package me.paultristanwagner.modelchecking.ts;
 
+import static me.paultristanwagner.modelchecking.util.Symbol.LOWERCASE_OMEGA;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import static me.paultristanwagner.modelchecking.util.Symbol.LOWERCASE_OMEGA;
 
 public record InfinitePath(List<String> start, List<String> cycle) {
 

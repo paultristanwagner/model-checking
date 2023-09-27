@@ -1,9 +1,9 @@
 package me.paultristanwagner.modelchecking.ctl.formula.path;
 
+import static me.paultristanwagner.modelchecking.util.Symbol.NEXT_SYMBOL;
+
 import me.paultristanwagner.modelchecking.ctl.formula.state.CTLFormula;
 import me.paultristanwagner.modelchecking.ctl.formula.state.CTLParenthesisFormula;
-
-import static me.paultristanwagner.modelchecking.util.Symbol.NEXT_SYMBOL;
 
 public class CTLNextFormula extends CTLPathFormula {
   

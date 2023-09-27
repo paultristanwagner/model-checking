@@ -4,9 +4,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public interface Parser<T> {
 
-  default T parse( String input ) {
-    return parse( input, new AtomicInteger( 0 ) );
+  default T parse(String input) {
+    return parse(input, new AtomicInteger(0));
   }
-  
-  T parse( String input, AtomicInteger index );
+
+  T parse(String input, AtomicInteger index);
 }
