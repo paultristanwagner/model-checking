@@ -49,17 +49,21 @@ public class BasicCTLStarModelChecker implements CTLStarModelChecker {
   public Set<String> sat(TransitionSystem ts, CTLStarFormula formula) {
     if (formula instanceof CTLStarTrueFormula) {
       return satTrue(ts);
+    } else if (formula instanceof CTLStarFalseFormula) {
+      return satFalse(ts);
     } else if (formula instanceof CTLStarIdentifierFormula identifierFormula) {
       return satIdentifier(ts, identifierFormula);
     } else if (formula instanceof CTLStarAndFormula andFormula) {
       return satAnd(ts, andFormula);
+    } else if (formula instanceof CTLStarOrFormula orFormula) {
+      return satOr(ts, orFormula);
     } else if (formula instanceof CTLStarNotFormula notFormula) {
       return satNot(ts, notFormula);
     } else if (formula instanceof CTLStarParenthesisFormula parenthesisFormula) {
       return sat(ts, parenthesisFormula.getFormula());
     } else if (formula instanceof CTLStarExistsFormula existsFormula) {
       return satExists(ts, existsFormula);
-    } else if(formula instanceof CTLStarAllFormula allFormula) {
+    } else if (formula instanceof CTLStarAllFormula allFormula) {
       return satAll(ts, allFormula);
     }
 
@@ -86,6 +90,10 @@ public class BasicCTLStarModelChecker implements CTLStarModelChecker {
     return new HashSet<>(ts.getStates());
   }
 
+  private Set<String> satFalse(TransitionSystem ts) {
+    return new HashSet<>();
+  }
+
   private Set<String> satIdentifier(TransitionSystem ts, CTLStarIdentifierFormula formula) {
     String atomicProposition = formula.getIdentifier();
 
@@ -103,6 +111,14 @@ public class BasicCTLStarModelChecker implements CTLStarModelChecker {
     Set<String> satStates = new HashSet<>(ts.getStates());
     for (CTLStarFormula component : andFormula.getComponents()) {
       satStates.retainAll(sat(ts, component));
+    }
+    return satStates;
+  }
+
+  private Set<String> satOr(TransitionSystem ts, CTLStarOrFormula orFormula) {
+    Set<String> satStates = new HashSet<>();
+    for (CTLStarFormula component : orFormula.getComponents()) {
+      satStates.addAll(sat(ts, component));
     }
     return satStates;
   }
@@ -128,6 +144,7 @@ public class BasicCTLStarModelChecker implements CTLStarModelChecker {
       }
 
       if (subFormula instanceof CTLStarTrueFormula
+          || subFormula instanceof CTLStarFalseFormula
           || subFormula instanceof CTLStarIdentifierFormula
           || subFormula instanceof CTLStarExistsFormula
           || subFormula instanceof CTLStarAllFormula) {
@@ -146,6 +163,18 @@ public class BasicCTLStarModelChecker implements CTLStarModelChecker {
 
         if (allStateSubFormulas) {
           stateSubFormulas.add(andFormula);
+        }
+      } else if (subFormula instanceof CTLStarOrFormula orFormula) { // depends
+        boolean allStateSubFormulas = true;
+        for (CTLStarFormula component : orFormula.getComponents()) {
+          if (!stateSubFormulas.contains(component)) {
+            allStateSubFormulas = false;
+            break;
+          }
+        }
+
+        if (allStateSubFormulas) {
+          stateSubFormulas.add(orFormula);
         }
       } else if (subFormula instanceof CTLStarNotFormula notFormula) { // depends
         if (stateSubFormulas.contains(notFormula.getFormula())) {

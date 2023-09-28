@@ -3,12 +3,19 @@ package me.paultristanwagner.modelchecking.ctlstar.formula;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import me.paultristanwagner.modelchecking.ltl.formula.LTLFalseFormula;
 import me.paultristanwagner.modelchecking.ltl.formula.LTLFormula;
-import me.paultristanwagner.modelchecking.ltl.formula.LTLTrueFormula;
 
-public class CTLStarTrueFormula extends CTLStarFormula {
+public class CTLStarFalseFormula extends CTLStarFormula {
 
-  private CTLStarTrueFormula() {}
+  private CTLStarFalseFormula() {
+
+  }
+
+  public static CTLStarFalseFormula FALSE() {
+    return new CTLStarFalseFormula();
+  }
+
 
   @Override
   public int getDepth() {
@@ -20,10 +27,6 @@ public class CTLStarTrueFormula extends CTLStarFormula {
     // nothing to do
   }
 
-  public static CTLStarTrueFormula TRUE() {
-    return new CTLStarTrueFormula();
-  }
-
   @Override
   public Set<CTLStarFormula> getSubFormulas() {
     Set<CTLStarFormula> subFormulas = new HashSet<>();
@@ -33,21 +36,21 @@ public class CTLStarTrueFormula extends CTLStarFormula {
 
   @Override
   public LTLFormula toLTL() {
-    return LTLTrueFormula.TRUE();
+    return LTLFalseFormula.FALSE();
   }
 
   @Override
   public String toString() {
-    return "true";
+    return "false";
   }
 
   @Override
   public boolean equals(Object obj) {
-    return obj instanceof CTLStarTrueFormula;
+    return obj instanceof CTLStarFalseFormula;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(true);
+    return Objects.hash(false);
   }
 }

@@ -4,6 +4,7 @@ import static me.paultristanwagner.modelchecking.ctlstar.formula.CTLStarAllFormu
 import static me.paultristanwagner.modelchecking.ctlstar.formula.CTLStarAlwaysFormula.always;
 import static me.paultristanwagner.modelchecking.ctlstar.formula.CTLStarEventuallyFormula.eventually;
 import static me.paultristanwagner.modelchecking.ctlstar.formula.CTLStarExistsFormula.exists;
+import static me.paultristanwagner.modelchecking.ctlstar.formula.CTLStarFalseFormula.FALSE;
 import static me.paultristanwagner.modelchecking.ctlstar.formula.CTLStarIdentifierFormula.identifier;
 import static me.paultristanwagner.modelchecking.ctlstar.formula.CTLStarNextFormula.next;
 import static me.paultristanwagner.modelchecking.ctlstar.formula.CTLStarNotFormula.not;
@@ -24,12 +25,16 @@ import me.paultristanwagner.modelchecking.parse.SyntaxError;
 public class CTLStarParser implements Parser<CTLStarFormula> {
 
   /*
+  *
   *    <A> ::= <B>
-  *        | <A> AND <B>
-  *    <B> ::= NOT <B>
+  *        | <A> OR <B>
+  *    <B> ::= <C>
+  *        | <B> AND <C>
+  *    <C> ::= NOT <C>
   *        | EXISTS <PATH>
   *        | ALL <PATH>
   *        | TRUE
+  *        | FALSE
   *        | IDENTIFIER
   *        | '(' <A> ')'
   *
@@ -67,9 +72,26 @@ public class CTLStarParser implements Parser<CTLStarFormula> {
     CTLStarFormula first = B(lexer);
     components.add(first);
 
+    while (lexer.hasNextToken() && lexer.getLookahead().getType() == OR) {
+      lexer.consume(OR);
+      components.add(B(lexer));
+    }
+
+    if (components.size() == 1) {
+      return first;
+    }
+
+    return CTLStarOrFormula.or(components);
+  }
+
+  private CTLStarFormula B(Lexer lexer) {
+    List<CTLStarFormula> components = new ArrayList<>();
+    CTLStarFormula first = C(lexer);
+    components.add(first);
+
     while (lexer.hasNextToken() && lexer.getLookahead().getType() == AND) {
       lexer.consume(AND);
-      components.add(B(lexer));
+      components.add(C(lexer));
     }
 
     if (components.size() == 1) {
@@ -79,10 +101,10 @@ public class CTLStarParser implements Parser<CTLStarFormula> {
     return CTLStarAndFormula.and(components);
   }
 
-  private CTLStarFormula B(Lexer lexer) {
+  private CTLStarFormula C(Lexer lexer) {
     if (lexer.getLookahead().getType() == NOT) {
       lexer.consume(NOT);
-      return not(B(lexer));
+      return not(C(lexer));
     } else if (lexer.getLookahead().getType() == EXISTS) {
       lexer.consume(EXISTS);
       return exists(parsePathFormula(lexer));
@@ -92,6 +114,9 @@ public class CTLStarParser implements Parser<CTLStarFormula> {
     } else if (lexer.getLookahead().getType() == TRUE) {
       lexer.consume(TRUE);
       return TRUE();
+    } else if (lexer.getLookahead().getType() == FALSE) {
+      lexer.consume(FALSE);
+      return FALSE();
     } else if (lexer.getLookahead().getType() == IDENTIFIER) {
       String identifier = lexer.getLookahead().getValue();
       lexer.consume(IDENTIFIER);
