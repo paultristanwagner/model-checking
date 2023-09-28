@@ -1,5 +1,8 @@
 package me.paultristanwagner.modelchecking.ctlstar.parse;
 
+import static me.paultristanwagner.modelchecking.ctlstar.formula.CTLStarAllFormula.all;
+import static me.paultristanwagner.modelchecking.ctlstar.formula.CTLStarAlwaysFormula.always;
+import static me.paultristanwagner.modelchecking.ctlstar.formula.CTLStarEventuallyFormula.eventually;
 import static me.paultristanwagner.modelchecking.ctlstar.formula.CTLStarExistsFormula.exists;
 import static me.paultristanwagner.modelchecking.ctlstar.formula.CTLStarIdentifierFormula.identifier;
 import static me.paultristanwagner.modelchecking.ctlstar.formula.CTLStarNextFormula.next;
@@ -16,6 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import me.paultristanwagner.modelchecking.ctlstar.formula.*;
 import me.paultristanwagner.modelchecking.parse.Lexer;
 import me.paultristanwagner.modelchecking.parse.Parser;
+import me.paultristanwagner.modelchecking.parse.SyntaxError;
 
 public class CTLStarParser implements Parser<CTLStarFormula> {
 
@@ -24,6 +28,7 @@ public class CTLStarParser implements Parser<CTLStarFormula> {
   *        | <A> AND <B>
   *    <B> ::= NOT <B>
   *        | EXISTS <PATH>
+  *        | ALL <PATH>
   *        | TRUE
   *        | IDENTIFIER
   *        | '(' <A> ')'
@@ -34,11 +39,13 @@ public class CTLStarParser implements Parser<CTLStarFormula> {
   *        | <Y> UNTIL <Z>
   *
   *    <Z> ::= NEXT <Z>
-  *           | NOT <Z>
-  *           | IDENTIFIER
-  *           | '(' <PATH> ')'
-  *           | <Z> UNTIL <Z>
-  *           | <A>
+  *        | ALWAYS <Z>
+  *        | EVENTUALLY <Z>
+  *        | NOT <Z>
+  *        | IDENTIFIER
+  *        | '(' <PATH> ')'
+  *        | <Z> UNTIL <Z>
+  *        | <A>
 
   */
   @Override
@@ -79,6 +86,9 @@ public class CTLStarParser implements Parser<CTLStarFormula> {
     } else if (lexer.getLookahead().getType() == EXISTS) {
       lexer.consume(EXISTS);
       return exists(parsePathFormula(lexer));
+    } else if (lexer.getLookahead().getType() == ALL) {
+      lexer.consume(ALL);
+      return all(parsePathFormula(lexer));
     } else if (lexer.getLookahead().getType() == TRUE) {
       lexer.consume(TRUE);
       return TRUE();
@@ -90,7 +100,10 @@ public class CTLStarParser implements Parser<CTLStarFormula> {
       return parseParenthesisStateFormula(lexer);
     }
 
-    throw new IllegalStateException("Unexpected token: " + lexer.getLookahead().getType());
+    throw new SyntaxError(
+        "Unexpected token " + lexer.getLookahead().getType().getName(),
+        lexer.getInput(),
+        lexer.getTokenStart());
   }
 
   private CTLStarFormula parseParenthesisStateFormula(Lexer lexer) {
@@ -135,6 +148,12 @@ public class CTLStarParser implements Parser<CTLStarFormula> {
     } else if (lexer.getLookahead().getType() == NOT) {
       lexer.consume(NOT);
       return not(Z(lexer));
+    } else if (lexer.getLookahead().getType() == EVENTUALLY) {
+      lexer.consume(EVENTUALLY);
+      return eventually(Z(lexer));
+    } else if (lexer.getLookahead().getType() == ALWAYS) {
+      lexer.consume(ALWAYS);
+      return always(Z(lexer));
     } else if (lexer.getLookahead().getType() == LPAREN) {
       return parseParenthesisPathFormula(lexer);
     } else if (lexer.getLookahead().getType() == IDENTIFIER) {

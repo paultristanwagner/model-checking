@@ -10,7 +10,7 @@ import me.paultristanwagner.modelchecking.automaton.GNBA;
 import me.paultristanwagner.modelchecking.automaton.GNBABuilder;
 import me.paultristanwagner.modelchecking.automaton.NBA;
 import me.paultristanwagner.modelchecking.ltl.formula.*;
-import me.paultristanwagner.modelchecking.ts.InfinitePath;
+import me.paultristanwagner.modelchecking.ts.CyclePath;
 import me.paultristanwagner.modelchecking.ts.TSPersistenceResult;
 import me.paultristanwagner.modelchecking.ts.TransitionSystem;
 
@@ -32,9 +32,37 @@ public class BasicLTLModelChecker implements LTLModelChecker {
     if (result.isPersistent()) {
       return models();
     } else {
-      InfinitePath counterExample = result.getWitness().reduce();
+      CyclePath counterExample = result.getWitness().reduce();
       return doesNotModel(counterExample);
     }
+  }
+
+  @Override
+  public Set<String> sat(TransitionSystem ts, LTLFormula formula) {
+    Set<String> result = new HashSet<>();
+
+    LTLFormula negation = formula.negate();
+
+    GNBA gnba = computeGNBA(ts, negation);
+
+    NBA nba = gnba.convertToNBA();
+
+    Set<String> persistentStates = new HashSet<>(nba.getStates());
+    nba.getAcceptingStates().forEach(persistentStates::remove);
+
+    TransitionSystem copy = ts.copy();
+    for (String state : ts.getStates()) {
+      copy.clearInitialStates();
+      copy.addInitialState(state);
+
+      TransitionSystem synchronousProduct = copy.reachableSynchronousProduct(nba);
+      TSPersistenceResult persistenceResult = synchronousProduct.checkPersistence(persistentStates);
+      if (persistenceResult.isPersistent()) {
+        result.add(state);
+      }
+    }
+
+    return result;
   }
 
   private GNBA computeGNBA(TransitionSystem ts, LTLFormula formula) {

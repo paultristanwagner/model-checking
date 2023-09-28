@@ -2,33 +2,20 @@ package me.paultristanwagner.modelchecking.ctlstar.formula;
 
 import java.util.Objects;
 import java.util.Set;
+import me.paultristanwagner.modelchecking.ltl.formula.LTLAlwaysFormula;
 import me.paultristanwagner.modelchecking.ltl.formula.LTLFormula;
-import me.paultristanwagner.modelchecking.ltl.formula.LTLParenthesisFormula;
+import me.paultristanwagner.modelchecking.util.Symbol;
 
-public class CTLStarParenthesisFormula extends CTLStarFormula {
+public class CTLStarAlwaysFormula extends CTLStarFormula {
 
   private CTLStarFormula formula;
 
-  private CTLStarParenthesisFormula(CTLStarFormula formula) {
+  private CTLStarAlwaysFormula(CTLStarFormula formula) {
     this.formula = formula;
   }
 
-  public static CTLStarParenthesisFormula parenthesis(CTLStarFormula formula) {
-    return new CTLStarParenthesisFormula(formula);
-  }
-
-  @Override
-  public int getDepth() {
-    return formula.getDepth() + 1;
-  }
-
-  @Override
-  public void replaceFormula(CTLStarFormula target, String freshVariable) {
-    if (formula.equals(target)) {
-      formula = CTLStarIdentifierFormula.identifier(freshVariable);
-    } else {
-      formula.replaceFormula(target, freshVariable);
-    }
+  public static CTLStarAlwaysFormula always(CTLStarFormula formula) {
+    return new CTLStarAlwaysFormula(formula);
   }
 
   @Override
@@ -39,8 +26,22 @@ public class CTLStarParenthesisFormula extends CTLStarFormula {
   }
 
   @Override
+  public int getDepth() {
+    return formula.getDepth() + 1;
+  }
+
+  @Override
+  public void replaceFormula(CTLStarFormula target, String freshVariable) {
+    if (formula == target) {
+      formula = CTLStarIdentifierFormula.identifier(freshVariable);
+    } else {
+      formula.replaceFormula(target, freshVariable);
+    }
+  }
+
+  @Override
   public LTLFormula toLTL() {
-    return LTLParenthesisFormula.parenthesis(formula.toLTL());
+    return LTLAlwaysFormula.always(formula.toLTL());
   }
 
   public CTLStarFormula getFormula() {
@@ -49,14 +50,14 @@ public class CTLStarParenthesisFormula extends CTLStarFormula {
 
   @Override
   public String toString() {
-    return "(" + formula + ")";
+    return Symbol.ALWAYS_SYMBOL + formula;
   }
 
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    CTLStarParenthesisFormula that = (CTLStarParenthesisFormula) o;
+    CTLStarAlwaysFormula that = (CTLStarAlwaysFormula) o;
     return Objects.equals(formula, that.formula);
   }
 

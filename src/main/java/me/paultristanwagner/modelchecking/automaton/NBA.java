@@ -5,7 +5,7 @@ import static me.paultristanwagner.modelchecking.util.TupleUtil.stringTuple;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.util.*;
-import me.paultristanwagner.modelchecking.ts.InfinitePath;
+import me.paultristanwagner.modelchecking.ts.CyclePath;
 
 public class NBA {
 
@@ -115,7 +115,7 @@ public class NBA {
             List<String> piList = new ArrayList<>(pi);
             List<String> xiList = new ArrayList<>(xi);
 
-            InfinitePath witness = new InfinitePath(piList, xiList);
+            CyclePath witness = new CyclePath(piList, xiList);
             return NBAEmptinessResult.nonEmpty(witness);
           }
         }

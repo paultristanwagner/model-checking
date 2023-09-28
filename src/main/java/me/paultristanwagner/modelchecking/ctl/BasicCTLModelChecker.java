@@ -32,7 +32,8 @@ public class BasicCTLModelChecker implements CTLModelChecker {
     }
   }
 
-  private Set<String> sat(TransitionSystem ts, CTLFormula formula) {
+  @Override
+  public Set<String> sat(TransitionSystem ts, CTLFormula formula) {
     if (formula instanceof CTLIdentifierFormula identifierFormula) {
       return satIdentifier(ts, identifierFormula);
     } else if (formula instanceof CTLNotFormula notFormula) {

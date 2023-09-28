@@ -3,18 +3,18 @@ package me.paultristanwagner.modelchecking.ctlstar.formula;
 import java.util.Objects;
 import java.util.Set;
 import me.paultristanwagner.modelchecking.ltl.formula.LTLFormula;
-import me.paultristanwagner.modelchecking.ltl.formula.LTLParenthesisFormula;
+import me.paultristanwagner.modelchecking.util.Symbol;
 
-public class CTLStarParenthesisFormula extends CTLStarFormula {
+public class CTLStarAllFormula extends CTLStarFormula {
 
   private CTLStarFormula formula;
 
-  private CTLStarParenthesisFormula(CTLStarFormula formula) {
+  private CTLStarAllFormula(CTLStarFormula formula) {
     this.formula = formula;
   }
 
-  public static CTLStarParenthesisFormula parenthesis(CTLStarFormula formula) {
-    return new CTLStarParenthesisFormula(formula);
+  public static CTLStarAllFormula all(CTLStarFormula formula) {
+    return new CTLStarAllFormula(formula);
   }
 
   @Override
@@ -24,7 +24,7 @@ public class CTLStarParenthesisFormula extends CTLStarFormula {
 
   @Override
   public void replaceFormula(CTLStarFormula target, String freshVariable) {
-    if (formula.equals(target)) {
+    if (formula == target) {
       formula = CTLStarIdentifierFormula.identifier(freshVariable);
     } else {
       formula.replaceFormula(target, freshVariable);
@@ -40,7 +40,8 @@ public class CTLStarParenthesisFormula extends CTLStarFormula {
 
   @Override
   public LTLFormula toLTL() {
-    return LTLParenthesisFormula.parenthesis(formula.toLTL());
+    throw new UnsupportedOperationException(
+        "CTL* to LTL conversion is not supported for CTL* all formulas");
   }
 
   public CTLStarFormula getFormula() {
@@ -49,14 +50,14 @@ public class CTLStarParenthesisFormula extends CTLStarFormula {
 
   @Override
   public String toString() {
-    return "(" + formula + ")";
+    return Symbol.UNIVERSAL_QUANTIFIER_SYMBOL + formula;
   }
 
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    CTLStarParenthesisFormula that = (CTLStarParenthesisFormula) o;
+    CTLStarAllFormula that = (CTLStarAllFormula) o;
     return Objects.equals(formula, that.formula);
   }
 

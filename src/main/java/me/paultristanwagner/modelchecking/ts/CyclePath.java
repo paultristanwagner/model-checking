@@ -5,7 +5,7 @@ import static me.paultristanwagner.modelchecking.util.Symbol.LOWERCASE_OMEGA;
 import java.util.ArrayList;
 import java.util.List;
 
-public record InfinitePath(List<String> start, List<String> cycle) {
+public record CyclePath(List<String> start, List<String> cycle) {
 
   private static final String TUPLE_PREFIX = "(";
   private static final String TUPLE_SUFFIX = ")";
@@ -33,7 +33,7 @@ public record InfinitePath(List<String> start, List<String> cycle) {
     return sb.toString();
   }
 
-  public InfinitePath reduce() {
+  public CyclePath reduce() {
     for (String s : start) {
       if (!s.startsWith(TUPLE_PREFIX) || !s.endsWith(TUPLE_SUFFIX)) {
         return this;
@@ -49,7 +49,7 @@ public record InfinitePath(List<String> start, List<String> cycle) {
     List<String> transformedStart = transformList(start);
     List<String> transformedCycle = transformList(cycle);
 
-    return new InfinitePath(transformedStart, transformedCycle);
+    return new CyclePath(transformedStart, transformedCycle);
   }
 
   private List<String> transformList(List<String> list) {

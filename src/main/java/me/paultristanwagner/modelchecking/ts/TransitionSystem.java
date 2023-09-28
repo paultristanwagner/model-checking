@@ -47,6 +47,17 @@ public class TransitionSystem {
     }
   }
 
+  public TransitionSystem copy() {
+    List<String> states = new ArrayList<>(this.states);
+    List<TSTransition> transitions = new ArrayList<>(this.transitions);
+    List<String> initialStates = new ArrayList<>(this.initialStates);
+    List<String> atomicPropositions = new ArrayList<>(this.atomicPropositions);
+    Map<String, List<String>> labelingFunction = new HashMap<>(this.labelingFunction);
+
+    return new TransitionSystem(
+        states, transitions, initialStates, atomicPropositions, labelingFunction);
+  }
+
   public TransitionSystem reachableSynchronousProduct(NBA nba) {
     TransitionSystemBuilder builder = new TransitionSystemBuilder();
 
@@ -177,7 +188,7 @@ public class TransitionSystem {
             List<String> piList = new ArrayList<>(pi);
             List<String> xiList = new ArrayList<>(xi);
 
-            InfinitePath witness = new InfinitePath(piList, xiList);
+            CyclePath witness = new CyclePath(piList, xiList);
             return notPersistent(witness);
           }
         }
@@ -185,6 +196,26 @@ public class TransitionSystem {
     }
 
     return persistent();
+  }
+
+  public String introduceFreshAtomicProposition() {
+    int i = 0;
+    while (true) {
+      String atomicProposition = "a_" + i;
+      if (!atomicPropositions.contains(atomicProposition)) {
+        atomicPropositions.add(atomicProposition);
+        return atomicProposition;
+      }
+      i++;
+    }
+  }
+
+  public void clearInitialStates() {
+    initialStates.clear();
+  }
+
+  public void addInitialState(String state) {
+    initialStates.add(state);
   }
 
   @Override
@@ -210,6 +241,10 @@ public class TransitionSystem {
 
   public List<String> getAtomicPropositions() {
     return atomicPropositions;
+  }
+
+  public void addLabel(String state, String atomicProposition) {
+    labelingFunction.get(state).add(atomicProposition);
   }
 
   public List<String> getLabel(String state) {
