@@ -276,6 +276,18 @@ public class BasicLTLModelChecker implements LTLModelChecker {
         boolean lhs;
         boolean rhs;
 
+        if(formula instanceof LTLTrueFormula
+          || formula instanceof LTLFalseFormula
+          || formula instanceof LTLIdentifierFormula
+          || formula instanceof LTLParenthesisFormula
+          || formula instanceof LTLNextFormula
+          || formula instanceof LTLUntilFormula
+          || formula instanceof LTLEventuallyFormula
+          || formula instanceof LTLAlwaysFormula
+          || formula instanceof LTLNotFormula) {
+          continue;
+        }
+
         if (formula instanceof LTLAndFormula andFormula) {
           lhs = isAssumed(andFormula);
 
@@ -298,6 +310,16 @@ public class BasicLTLModelChecker implements LTLModelChecker {
           if (lhs != rhs) {
             return false;
           }
+        } else if(formula instanceof LTLImplicationFormula implicationFormula) {
+          lhs = isAssumed(implicationFormula);
+
+          rhs = !isAssumed(implicationFormula.getLeft()) || isAssumed(implicationFormula.getRight());
+
+          if (lhs != rhs) {
+            return false;
+          }
+        } else {
+          throw new UnsupportedOperationException("Unsupported formula: " + formula);
         }
       }
 

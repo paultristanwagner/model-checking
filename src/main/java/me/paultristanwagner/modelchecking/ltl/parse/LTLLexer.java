@@ -14,6 +14,8 @@ public class LTLLexer extends Lexer {
   static final TokenType NOT = TokenType.of("not", "^(" + NOT_SYMBOL + "|!|not|NOT|~)");
   static final TokenType AND = TokenType.of("and", "^(" + AND_SYMBOL + "|&|and|AND)");
   static final TokenType OR = TokenType.of("or", "^(" + OR_SYMBOL + "|\\||or|OR)");
+  static final TokenType IMPLICATION =
+      TokenType.of("implication", "^(" + IMPLICATION_SYMBOL + "|->|implies|IMPLIES)");
   static final TokenType NEXT = TokenType.of("next", "^(" + NEXT_SYMBOL + "|next|NEXT|O)");
   static final TokenType UNTIL = TokenType.of("until", "^(" + UNTIL_SYMBOL + "|until|UNTIL)");
   static final TokenType EVENTUALLY =
@@ -27,7 +29,7 @@ public class LTLLexer extends Lexer {
     super(input);
 
     registerTokenTypes(
-        LPAREN, RPAREN, TRUE, FALSE, NOT, AND, OR, NEXT, UNTIL, EVENTUALLY, ALWAYS, IDENTIFIER);
+        LPAREN, RPAREN, TRUE, FALSE, NOT, AND, OR, IMPLICATION, NEXT, UNTIL, EVENTUALLY, ALWAYS, IDENTIFIER);
 
     this.initialize(input);
   }

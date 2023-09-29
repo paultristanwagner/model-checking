@@ -5,6 +5,7 @@ public class Symbol {
   public static final String NOT_SYMBOL = "¬";
   public static final String AND_SYMBOL = "∧";
   public static final String OR_SYMBOL = "∨";
+  public static final String IMPLICATION_SYMBOL = "→";
   public static final String NEXT_SYMBOL = "◯";
   public static final String UNTIL_SYMBOL = "U";
   public static final String EVENTUALLY_SYMBOL = "◊";
