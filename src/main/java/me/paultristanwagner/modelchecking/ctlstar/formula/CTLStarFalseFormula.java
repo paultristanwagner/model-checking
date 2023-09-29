@@ -8,14 +8,11 @@ import me.paultristanwagner.modelchecking.ltl.formula.LTLFormula;
 
 public class CTLStarFalseFormula extends CTLStarFormula {
 
-  private CTLStarFalseFormula() {
-
-  }
+  private CTLStarFalseFormula() {}
 
   public static CTLStarFalseFormula FALSE() {
     return new CTLStarFalseFormula();
   }
-
 
   @Override
   public int getDepth() {

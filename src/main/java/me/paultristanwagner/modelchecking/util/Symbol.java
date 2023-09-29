@@ -20,4 +20,7 @@ public class Symbol {
 
   public static final String MODELS_SYMBOL = "⊨";
   public static final String NOT_MODELS_SYMBOL = "⊭";
+
+  public static final String CHECKMARK = "✓";
+  public static final String CROSS = "✗";
 }

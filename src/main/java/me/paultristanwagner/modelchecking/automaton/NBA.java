@@ -51,7 +51,19 @@ public class NBA {
   public Set<String> getSuccessors(String state, String action) {
     Set<String> successors = new HashSet<>();
     for (NBATransition transition : transitions) {
-      if (transition.getFrom().equals(state) && transition.getAction().equals(action)) {
+      if (!transition.getFrom().equals(state)) {
+        continue;
+      }
+
+      // todo: make this more efficient
+      String a = transition.getAction();
+      String b = action;
+      Set<String> left = new HashSet<>(Arrays.asList(a.substring(1, a.length() - 1).split(", ")));
+      Set<String> right = new HashSet<>(Arrays.asList(b.substring(1, b.length() - 1).split(", ")));
+
+      boolean actionMatches = left.equals(right);
+
+      if (actionMatches) {
         successors.add(transition.getTo());
       }
     }

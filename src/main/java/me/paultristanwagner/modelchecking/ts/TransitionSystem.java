@@ -47,12 +47,24 @@ public class TransitionSystem {
     }
   }
 
+  public void verifyNoNullLabels() {
+    labelingFunction.forEach(
+        (state, labels) -> {
+          if (labels.contains(null)) {
+            throw new IllegalStateException("Null label for state " + state);
+          }
+        });
+  }
+
   public TransitionSystem copy() {
     List<String> states = new ArrayList<>(this.states);
     List<TSTransition> transitions = new ArrayList<>(this.transitions);
     List<String> initialStates = new ArrayList<>(this.initialStates);
     List<String> atomicPropositions = new ArrayList<>(this.atomicPropositions);
-    Map<String, List<String>> labelingFunction = new HashMap<>(this.labelingFunction);
+
+    Map<String, List<String>> labelingFunction = new HashMap<>();
+    this.labelingFunction.forEach(
+        (state, labels) -> labelingFunction.put(state, new ArrayList<>(labels)));
 
     return new TransitionSystem(
         states, transitions, initialStates, atomicPropositions, labelingFunction);
@@ -77,8 +89,17 @@ public class TransitionSystem {
 
         String q = nbaTransition.getTo();
 
-        // todo: match actions and labels more carefully
-        if (!nbaTransition.getAction().equals(label.toString())) {
+        String a = nbaTransition.getAction();
+        String b = label.toString();
+
+        // todo: make this more efficient
+        Set<String> left = new HashSet<>(Arrays.asList(a.substring(1, a.length() - 1).split(", ")));
+        Set<String> right =
+            new HashSet<>(Arrays.asList(b.substring(1, b.length() - 1).split(", ")));
+
+        boolean actionMatches = left.equals(right);
+
+        if (!actionMatches) {
           continue;
         }
 
@@ -253,9 +274,5 @@ public class TransitionSystem {
 
   public String toJson() {
     return GSON.toJson(this);
-  }
-
-  public static TransitionSystem fromJson(String string) {
-    return GSON.fromJson(string, TransitionSystem.class);
   }
 }

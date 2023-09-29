@@ -13,6 +13,7 @@ public class BasicCTLStarModelChecker implements CTLStarModelChecker {
 
   @Override
   public CTLStarModelCheckingResult check(TransitionSystem ts, CTLStarFormula formula) {
+    ts = ts.copy();
     while (true) {
       Set<CTLStarFormula> stateSubFormulas = getNonTrivialMinimalStateSubFormulas(formula);
 

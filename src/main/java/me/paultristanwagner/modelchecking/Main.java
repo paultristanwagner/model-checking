@@ -5,8 +5,10 @@ import static me.paultristanwagner.modelchecking.util.AnsiColor.*;
 import static me.paultristanwagner.modelchecking.util.Symbol.MODELS_SYMBOL;
 import static me.paultristanwagner.modelchecking.util.Symbol.NOT_MODELS_SYMBOL;
 
+import com.google.gson.JsonSyntaxException;
 import java.io.*;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Scanner;
@@ -15,6 +17,7 @@ import me.paultristanwagner.modelchecking.ctl.CTLModelChecker;
 import me.paultristanwagner.modelchecking.ctl.formula.state.CTLFormula;
 import me.paultristanwagner.modelchecking.ctl.parse.CTLParser;
 import me.paultristanwagner.modelchecking.ctlstar.BasicCTLStarModelChecker;
+import me.paultristanwagner.modelchecking.ctlstar.CTLStarModelChecker;
 import me.paultristanwagner.modelchecking.ctlstar.formula.CTLStarFormula;
 import me.paultristanwagner.modelchecking.ctlstar.parse.CTLStarParser;
 import me.paultristanwagner.modelchecking.ltl.BasicLTLModelChecker;
@@ -25,6 +28,7 @@ import me.paultristanwagner.modelchecking.ltl.parse.LTLParser;
 import me.paultristanwagner.modelchecking.parse.SyntaxError;
 import me.paultristanwagner.modelchecking.ts.CyclePath;
 import me.paultristanwagner.modelchecking.ts.TransitionSystem;
+import me.paultristanwagner.modelchecking.ts.TransitionSystemLoader;
 import me.paultristanwagner.modelchecking.util.Symbol;
 
 public class Main {
@@ -35,6 +39,7 @@ public class Main {
 
   public static void main(String[] args) {
     TransitionSystem ts = enterTransitionSystem();
+    ts.verifyNoNullLabels();
 
     while (true) {
       OUT.print("Enter formula: ");
@@ -82,7 +87,7 @@ public class Main {
 
         OUT.println(phiSymbol + " := " + formula + GRAY + " (CTL*)" + RESET);
 
-        BasicCTLStarModelChecker modelChecker = new BasicCTLStarModelChecker();
+        CTLStarModelChecker modelChecker = new BasicCTLStarModelChecker();
         result = modelChecker.check(ts, ctlStarFormula);
       } else {
         OUT.println(RED + "Unknown formula type" + RESET);
@@ -100,6 +105,7 @@ public class Main {
       long after = System.currentTimeMillis();
 
       long time_ms = after - before;
+      OUT.flush();
       OUT.println(GRAY + "(" + time_ms + " ms)" + RESET);
       OUT.println();
     }
@@ -209,22 +215,22 @@ public class Main {
     TransitionSystem ts = null;
     while (ts == null) {
       File file = null;
+      String fileName = null;
       while (file == null) {
         OUT.print("Enter file for Transition System: ");
-        String input;
         try {
-          input = SCANNER.nextLine();
+          fileName = SCANNER.nextLine();
         } catch (NoSuchElementException e) {
           return null;
         }
 
-        file = new File(input);
+        file = new File(fileName);
         if (!file.exists()) {
-          OUT.println(RED + "Error: File does not exist!" + RESET);
+          OUT.println(RED + "Error: File '" + fileName + "' does not exist!" + RESET);
           OUT.println();
           file = null;
         } else if (file.isDirectory()) {
-          OUT.println(RED + "Error: File is a directory!" + RESET);
+          OUT.println(RED + "Error: File '" + fileName + "' is a directory!" + RESET);
           OUT.println();
           file = null;
         }
@@ -234,16 +240,17 @@ public class Main {
       try {
         fileContent = new String(Files.readAllBytes(file.toPath()));
       } catch (IOException e) {
-        OUT.println(RED + "Error: Could not read file" + RESET);
+        OUT.println(RED + "Error: Could not read file '" + fileName + "'" + RESET);
         continue;
       }
 
       try {
-        ts = TransitionSystem.fromJson(fileContent);
+        ts = TransitionSystemLoader.fromJson(fileContent);
         OUT.println(GREEN + "Transition System loaded!" + RESET);
-      } catch (SyntaxError error) {
-        OUT.print(RED);
-        error.printWithContext();
+      } catch (JsonSyntaxException error) {
+        OUT.print(RED + "Error: Could not parse Transition System: ");
+        error.printStackTrace(OUT);
+        OUT.println(Arrays.toString(error.getStackTrace()));
         OUT.print(RESET);
       }
     }

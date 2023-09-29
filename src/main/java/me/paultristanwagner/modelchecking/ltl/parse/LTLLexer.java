@@ -23,13 +23,25 @@ public class LTLLexer extends Lexer {
           "eventually", "^(" + EVENTUALLY_SYMBOL + "|eventually|EVENTUALLY|diamond|DIAMOND)");
   static final TokenType ALWAYS =
       TokenType.of("always", "^(" + ALWAYS_SYMBOL + "|always|ALWAYS|box|BOX)");
-  static final TokenType IDENTIFIER = TokenType.of("identifier", "^[a-z]");
+  static final TokenType IDENTIFIER = TokenType.of("identifier", "^[a-zA-Z_][a-zA-Z0-9_]*");
 
   public LTLLexer(String input) {
     super(input);
 
     registerTokenTypes(
-        LPAREN, RPAREN, TRUE, FALSE, NOT, AND, OR, IMPLICATION, NEXT, UNTIL, EVENTUALLY, ALWAYS, IDENTIFIER);
+        LPAREN,
+        RPAREN,
+        TRUE,
+        FALSE,
+        NOT,
+        AND,
+        OR,
+        IMPLICATION,
+        NEXT,
+        UNTIL,
+        EVENTUALLY,
+        ALWAYS,
+        IDENTIFIER);
 
     this.initialize(input);
   }

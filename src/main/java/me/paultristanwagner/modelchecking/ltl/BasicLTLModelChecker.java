@@ -18,6 +18,8 @@ public class BasicLTLModelChecker implements LTLModelChecker {
 
   @Override
   public LTLModelCheckingResult check(TransitionSystem ts, LTLFormula formula) {
+    ts = ts.copy();
+
     LTLFormula negation = formula.negate();
 
     GNBA gnba = computeGNBA(ts, negation);
@@ -42,20 +44,19 @@ public class BasicLTLModelChecker implements LTLModelChecker {
     Set<String> result = new HashSet<>();
 
     LTLFormula negation = formula.negate();
-
     GNBA gnba = computeGNBA(ts, negation);
-
     NBA nba = gnba.convertToNBA();
 
-    Set<String> persistentStates = new HashSet<>(nba.getStates());
-    nba.getAcceptingStates().forEach(persistentStates::remove);
-
-    TransitionSystem copy = ts.copy();
     for (String state : ts.getStates()) {
-      copy.clearInitialStates();
-      copy.addInitialState(state);
+      TransitionSystem initial = ts.copy();
+      initial.clearInitialStates();
+      initial.addInitialState(state);
 
-      TransitionSystem synchronousProduct = copy.reachableSynchronousProduct(nba);
+      TransitionSystem synchronousProduct = initial.reachableSynchronousProduct(nba);
+
+      Set<String> persistentStates = new HashSet<>(nba.getStates());
+      nba.getAcceptingStates().forEach(persistentStates::remove);
+
       TSPersistenceResult persistenceResult = synchronousProduct.checkPersistence(persistentStates);
       if (persistenceResult.isPersistent()) {
         result.add(state);
@@ -204,6 +205,17 @@ public class BasicLTLModelChecker implements LTLModelChecker {
 
     Assignment assignment = new Assignment();
 
+    // todo: figure out what to do with this
+    for (LTLFormula ltlFormula : closure) {
+      if (ltlFormula instanceof LTLIdentifierFormula identifierFormula) {
+        String identifier = identifierFormula.getIdentifier();
+        if (!atomicPropositions.contains(identifier)) {
+          throw new IllegalStateException(
+              "Identifier '" + identifier + "' not in atomic propositions");
+        }
+      }
+    }
+
     // add all atomic propositions to the closure, even if they don't occur in the formula
     for (String atomicProposition : atomicPropositions) {
       LTLFormula atomicPropositionFormula = identifier(atomicProposition);
@@ -276,15 +288,15 @@ public class BasicLTLModelChecker implements LTLModelChecker {
         boolean lhs;
         boolean rhs;
 
-        if(formula instanceof LTLTrueFormula
-          || formula instanceof LTLFalseFormula
-          || formula instanceof LTLIdentifierFormula
-          || formula instanceof LTLParenthesisFormula
-          || formula instanceof LTLNextFormula
-          || formula instanceof LTLUntilFormula
-          || formula instanceof LTLEventuallyFormula
-          || formula instanceof LTLAlwaysFormula
-          || formula instanceof LTLNotFormula) {
+        if (formula instanceof LTLTrueFormula
+            || formula instanceof LTLFalseFormula
+            || formula instanceof LTLIdentifierFormula
+            || formula instanceof LTLParenthesisFormula
+            || formula instanceof LTLNextFormula
+            || formula instanceof LTLUntilFormula
+            || formula instanceof LTLEventuallyFormula
+            || formula instanceof LTLAlwaysFormula
+            || formula instanceof LTLNotFormula) {
           continue;
         }
 
@@ -310,10 +322,11 @@ public class BasicLTLModelChecker implements LTLModelChecker {
           if (lhs != rhs) {
             return false;
           }
-        } else if(formula instanceof LTLImplicationFormula implicationFormula) {
+        } else if (formula instanceof LTLImplicationFormula implicationFormula) {
           lhs = isAssumed(implicationFormula);
 
-          rhs = !isAssumed(implicationFormula.getLeft()) || isAssumed(implicationFormula.getRight());
+          rhs =
+              !isAssumed(implicationFormula.getLeft()) || isAssumed(implicationFormula.getRight());
 
           if (lhs != rhs) {
             return false;

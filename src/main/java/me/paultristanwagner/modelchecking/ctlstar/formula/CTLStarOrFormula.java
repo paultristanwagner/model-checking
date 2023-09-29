@@ -10,16 +10,16 @@ public class CTLStarOrFormula extends CTLStarFormula {
 
   private final List<CTLStarFormula> components;
 
-  private CTLStarOrFormula( List<CTLStarFormula> components ) {
+  private CTLStarOrFormula(List<CTLStarFormula> components) {
     this.components = components;
   }
 
-  public static CTLStarOrFormula or( List<CTLStarFormula> components ) {
-    return new CTLStarOrFormula( components );
+  public static CTLStarOrFormula or(List<CTLStarFormula> components) {
+    return new CTLStarOrFormula(components);
   }
 
-  public static CTLStarOrFormula or( CTLStarFormula... components ) {
-    return new CTLStarOrFormula( List.of( components ) );
+  public static CTLStarOrFormula or(CTLStarFormula... components) {
+    return new CTLStarOrFormula(List.of(components));
   }
 
   @Override
