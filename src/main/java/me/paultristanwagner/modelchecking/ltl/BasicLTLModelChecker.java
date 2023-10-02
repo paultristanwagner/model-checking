@@ -198,8 +198,7 @@ public class BasicLTLModelChecker implements LTLModelChecker {
     return reduced;
   }
 
-  private Set<B> computeElementarySets(
-      Set<String> atomicPropositions, Set<LTLFormula> closure) {
+  private Set<B> computeElementarySets(Set<String> atomicPropositions, Set<LTLFormula> closure) {
     Set<B> elementarySets = new HashSet<>();
 
     // todo: figure out what to do with this
@@ -224,14 +223,14 @@ public class BasicLTLModelChecker implements LTLModelChecker {
 
     int n = reduced.size();
     int m = 1 << n;
-    while(m > 0) {
+    while (m > 0) {
       m--;
 
       Set<LTLFormula> assumed = new HashSet<>();
 
       int i = 0;
       for (LTLFormula f : reduced) {
-        if((m & (1 << i)) != 0) {
+        if ((m & (1 << i)) != 0) {
           assumed.add(f);
         }
         i++;

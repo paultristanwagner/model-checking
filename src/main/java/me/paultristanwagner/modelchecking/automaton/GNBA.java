@@ -5,24 +5,23 @@ import static me.paultristanwagner.modelchecking.util.TupleUtil.stringTuple;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public final class GNBA {
 
   private static final Gson GSON;
-  private final List<String> states;
-  private final List<String> alphabet;
-  private final List<String> initialStates;
-  private final List<List<String>> acceptingSets;
-  private final List<NBATransition> transitions;
+  private final Set<String> states;
+  private final Set<String> alphabet;
+  private final Set<String> initialStates;
+  private final Set<Set<String>> acceptingSets;
+  private final Set<NBATransition> transitions;
 
   public GNBA(
-      List<String> states,
-      List<String> alphabet,
-      List<String> initialStates,
-      List<List<String>> acceptingSets,
-      List<NBATransition> transitions) {
+      Set<String> states,
+      Set<String> alphabet,
+      Set<String> initialStates,
+      Set<Set<String>> acceptingSets,
+      Set<NBATransition> transitions) {
     this.states = states;
     this.alphabet = alphabet;
     this.initialStates = initialStates;
@@ -79,7 +78,7 @@ public final class GNBA {
     }
 
     if (!acceptingSets.isEmpty()) {
-      List<String> acceptingSet = acceptingSets.get(0);
+      Set<String> acceptingSet = acceptingSets.stream().findFirst().get();
       for (String acceptingState : acceptingSet) {
         String nbaAcceptingState = stringTuple(acceptingState, 1);
         builder.addAcceptingState(nbaAcceptingState);
@@ -87,8 +86,8 @@ public final class GNBA {
     }
 
     for (NBATransition transition : transitions) {
-      for (int i = 0; i < acceptingSets.size(); i++) {
-        List<String> acceptingSet = acceptingSets.get(i);
+      int i = 0;
+      for (Set<String> acceptingSet : acceptingSets) {
         String nbaFrom = stringTuple(transition.getFrom(), i + 1);
         String nbaTo;
         if (acceptingSet.contains(transition.getFrom())) {
@@ -97,6 +96,8 @@ public final class GNBA {
           nbaTo = stringTuple(transition.getTo(), (i + 1));
         }
         builder.addTransition(nbaFrom, transition.getAction(), nbaTo);
+
+        i++;
       }
     }
 
@@ -123,7 +124,7 @@ public final class GNBA {
         builder.addAcceptingState(state);
       }
     } else {
-      for (String acceptingState : acceptingSets.get(0)) {
+      for (String acceptingState : acceptingSets.stream().findFirst().get()) {
         builder.addAcceptingState(acceptingState);
       }
     }
@@ -143,23 +144,23 @@ public final class GNBA {
     return GSON.fromJson(json, GNBA.class);
   }
 
-  public List<String> getStates() {
+  public Set<String> getStates() {
     return states;
   }
 
-  public List<String> getInitialStates() {
+  public Set<String> getInitialStates() {
     return initialStates;
   }
 
-  public List<String> getAlphabet() {
+  public Set<String> getAlphabet() {
     return alphabet;
   }
 
-  public List<List<String>> getAcceptingSets() {
+  public Set<Set<String>> getAcceptingSets() {
     return acceptingSets;
   }
 
-  public List<NBATransition> getTransitions() {
+  public Set<NBATransition> getTransitions() {
     return transitions;
   }
 }

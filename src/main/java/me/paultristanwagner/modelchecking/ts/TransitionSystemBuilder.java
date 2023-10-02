@@ -4,17 +4,17 @@ import java.util.*;
 
 public class TransitionSystemBuilder {
 
-  private final List<String> states;
-  private final List<TSTransition> transitions;
-  private final List<String> initialStates;
-  private final List<String> atomicPropositions;
-  private final Map<String, List<String>> labelingFunction;
+  private final Set<String> states;
+  private final Set<TSTransition> transitions;
+  private final Set<String> initialStates;
+  private final Set<String> atomicPropositions;
+  private final Map<String, Set<String>> labelingFunction;
 
   public TransitionSystemBuilder() {
-    this.states = new ArrayList<>();
-    this.transitions = new ArrayList<>();
-    this.initialStates = new ArrayList<>();
-    this.atomicPropositions = new ArrayList<>();
+    this.states = new HashSet<>();
+    this.transitions = new HashSet<>();
+    this.initialStates = new HashSet<>();
+    this.atomicPropositions = new HashSet<>();
     this.labelingFunction = new HashMap<>();
   }
 
@@ -62,14 +62,14 @@ public class TransitionSystemBuilder {
   }
 
   public TransitionSystemBuilder addLabel(String state, String atomicProposition) {
-    List<String> labels = labelingFunction.computeIfAbsent(state, k -> new ArrayList<>());
+    Set<String> labels = labelingFunction.computeIfAbsent(state, k -> new HashSet<>());
     labels.add(atomicProposition);
 
     return this;
   }
 
   public TransitionSystemBuilder addLabels(String state, String... atomicPropositions) {
-    List<String> labels = labelingFunction.computeIfAbsent(state, k -> new ArrayList<>());
+    Set<String> labels = labelingFunction.computeIfAbsent(state, k -> new HashSet<>());
     labels.addAll(Arrays.asList(atomicPropositions));
 
     return this;
@@ -80,7 +80,7 @@ public class TransitionSystemBuilder {
         states, transitions, initialStates, atomicPropositions, labelingFunction);
   }
 
-  public List<String> getInitialStates() {
+  public Set<String> getInitialStates() {
     return initialStates;
   }
 }

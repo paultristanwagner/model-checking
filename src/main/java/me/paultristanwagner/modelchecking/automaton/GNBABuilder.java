@@ -1,23 +1,22 @@
 package me.paultristanwagner.modelchecking.automaton;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 
 public class GNBABuilder {
 
-  private final List<String> states;
-  private final List<String> alphabet;
-  private final List<String> initialStates;
-  private final List<List<String>> acceptingSets;
-  private final List<NBATransition> transitions;
+  private final Set<String> states;
+  private final Set<String> alphabet;
+  private final Set<String> initialStates;
+  private final Set<Set<String>> acceptingSets;
+  private final Set<NBATransition> transitions;
 
   public GNBABuilder() {
-    this.states = new ArrayList<>();
-    this.alphabet = new ArrayList<>();
-    this.initialStates = new ArrayList<>();
-    this.acceptingSets = new ArrayList<>();
-    this.transitions = new ArrayList<>();
+    this.states = new HashSet<>();
+    this.alphabet = new HashSet<>();
+    this.initialStates = new HashSet<>();
+    this.acceptingSets = new HashSet<>();
+    this.transitions = new HashSet<>();
   }
 
   public GNBABuilder addStates(String... states) {
@@ -33,7 +32,7 @@ public class GNBABuilder {
     return this;
   }
 
-  public GNBABuilder setAlphabet(List<String> alphabet) {
+  public GNBABuilder setAlphabet(Set<String> alphabet) {
     this.alphabet.clear();
     this.alphabet.addAll(alphabet);
     return this;
@@ -44,13 +43,8 @@ public class GNBABuilder {
     return this;
   }
 
-  public GNBABuilder addAcceptingSet(String... acceptingSet) {
-    this.acceptingSets.add(List.of(acceptingSet));
-    return this;
-  }
-
   public GNBABuilder addAcceptingSet(Set<String> acceptingSet) {
-    this.acceptingSets.add(new ArrayList<>(acceptingSet));
+    this.acceptingSets.add(new HashSet<>(acceptingSet));
     return this;
   }
 

@@ -24,18 +24,18 @@ public class TransitionSystem {
             .create();
   }
 
-  private final List<String> states;
-  private final List<TSTransition> transitions;
-  private final List<String> initialStates;
-  private final List<String> atomicPropositions;
-  private final Map<String, List<String>> labelingFunction;
+  private final Set<String> states;
+  private final Set<TSTransition> transitions;
+  private final Set<String> initialStates;
+  private final Set<String> atomicPropositions;
+  private final Map<String, Set<String>> labelingFunction;
 
   public TransitionSystem(
-      List<String> states,
-      List<TSTransition> transitions,
-      List<String> initialStates,
-      List<String> atomicPropositions,
-      Map<String, List<String>> labelingFunction) {
+      Set<String> states,
+      Set<TSTransition> transitions,
+      Set<String> initialStates,
+      Set<String> atomicPropositions,
+      Map<String, Set<String>> labelingFunction) {
     this.states = states;
     this.transitions = transitions;
     this.initialStates = initialStates;
@@ -43,7 +43,7 @@ public class TransitionSystem {
     this.labelingFunction = labelingFunction;
 
     for (String state : states) {
-      labelingFunction.putIfAbsent(state, List.of());
+      labelingFunction.putIfAbsent(state, Set.of());
     }
   }
 
@@ -57,14 +57,14 @@ public class TransitionSystem {
   }
 
   public TransitionSystem copy() {
-    List<String> states = new ArrayList<>(this.states);
-    List<TSTransition> transitions = new ArrayList<>(this.transitions);
-    List<String> initialStates = new ArrayList<>(this.initialStates);
-    List<String> atomicPropositions = new ArrayList<>(this.atomicPropositions);
+    Set<String> states = new HashSet<>(this.states);
+    Set<TSTransition> transitions = new HashSet<>(this.transitions);
+    Set<String> initialStates = new HashSet<>(this.initialStates);
+    Set<String> atomicPropositions = new HashSet<>(this.atomicPropositions);
 
-    Map<String, List<String>> labelingFunction = new HashMap<>();
+    Map<String, Set<String>> labelingFunction = new HashMap<>();
     this.labelingFunction.forEach(
-        (state, labels) -> labelingFunction.put(state, new ArrayList<>(labels)));
+        (state, labels) -> labelingFunction.put(state, new HashSet<>(labels)));
 
     return new TransitionSystem(
         states, transitions, initialStates, atomicPropositions, labelingFunction);
@@ -79,7 +79,7 @@ public class TransitionSystem {
 
     Queue<SimpleEntry<String, String>> queue = new ArrayDeque<>();
     for (String initialState : initialStates) {
-      List<String> label = labelingFunction.get(initialState);
+      Set<String> label = labelingFunction.get(initialState);
 
       for (NBATransition nbaTransition : nba.getTransitions()) {
         String q0 = nbaTransition.getFrom();
@@ -122,7 +122,7 @@ public class TransitionSystem {
       List<String> sSuccessors = getSuccessors(s);
 
       for (String sSuccessor : sSuccessors) {
-        List<String> sSuccessorLabel = labelingFunction.get(sSuccessor);
+        Set<String> sSuccessorLabel = labelingFunction.get(sSuccessor);
         String sSuccessorLabelString = sSuccessorLabel.toString();
         Set<String> qSuccessors = nba.getSuccessors(q, sSuccessorLabelString);
         for (String qSuccessor : qSuccessors) {
@@ -201,7 +201,7 @@ public class TransitionSystem {
           pi.push(s1);
         } else {
           pi.pop();
-          List<String> labels = labelingFunction.get(s);
+          Set<String> labels = labelingFunction.get(s);
 
           boolean notPersistentState = labels.stream().noneMatch(persistentStates::contains);
 
@@ -244,11 +244,11 @@ public class TransitionSystem {
     return toJson();
   }
 
-  public List<String> getStates() {
+  public Set<String> getStates() {
     return states;
   }
 
-  public List<String> getInitialStates() {
+  public Set<String> getInitialStates() {
     return initialStates;
   }
 
@@ -260,7 +260,7 @@ public class TransitionSystem {
         .toList();
   }
 
-  public List<String> getAtomicPropositions() {
+  public Set<String> getAtomicPropositions() {
     return atomicPropositions;
   }
 
@@ -268,7 +268,7 @@ public class TransitionSystem {
     labelingFunction.get(state).add(atomicProposition);
   }
 
-  public List<String> getLabel(String state) {
+  public Set<String> getLabel(String state) {
     return labelingFunction.get(state);
   }
 

@@ -19,18 +19,18 @@ public class NBA {
             .create();
   }
 
-  private final List<String> states;
-  private final List<String> alphabet;
-  private final List<String> initialStates;
-  private final List<String> acceptingStates;
-  private final List<NBATransition> transitions;
+  private final Set<String> states;
+  private final Set<String> alphabet;
+  private final Set<String> initialStates;
+  private final Set<String> acceptingStates;
+  private final Set<NBATransition> transitions;
 
   public NBA(
-      List<String> states,
-      List<String> alphabet,
-      List<String> initialStates,
-      List<String> acceptingStates,
-      List<NBATransition> transitions) {
+      Set<String> states,
+      Set<String> alphabet,
+      Set<String> initialStates,
+      Set<String> acceptingStates,
+      Set<NBATransition> transitions) {
     this.states = states;
     this.alphabet = alphabet;
     this.initialStates = initialStates;
@@ -138,13 +138,13 @@ public class NBA {
   }
 
   public GNBA toGNBA() {
-    List<String> states = new ArrayList<>(this.states);
-    List<String> alphabet = new ArrayList<>(this.alphabet);
-    List<String> initialStates = new ArrayList<>(this.initialStates);
-    List<NBATransition> transitions = new ArrayList<>(this.transitions);
+    Set<String> states = new HashSet<>(this.states);
+    Set<String> alphabet = new HashSet<>(this.alphabet);
+    Set<String> initialStates = new HashSet<>(this.initialStates);
+    Set<NBATransition> transitions = new HashSet<>(this.transitions);
 
-    List<List<String>> acceptingSets = new ArrayList<>();
-    acceptingSets.add(new ArrayList<>(this.acceptingStates));
+    Set<Set<String>> acceptingSets = new HashSet<>();
+    acceptingSets.add(new HashSet<>(this.acceptingStates));
 
     return new GNBA(states, alphabet, initialStates, acceptingSets, transitions);
   }
@@ -209,23 +209,23 @@ public class NBA {
     return GSON.fromJson(json, NBA.class);
   }
 
-  public List<String> getStates() {
+  public Set<String> getStates() {
     return states;
   }
 
-  public List<String> getAlphabet() {
+  public Set<String> getAlphabet() {
     return alphabet;
   }
 
-  public List<String> getInitialStates() {
+  public Set<String> getInitialStates() {
     return initialStates;
   }
 
-  public List<String> getAcceptingStates() {
+  public Set<String> getAcceptingStates() {
     return acceptingStates;
   }
 
-  public List<NBATransition> getTransitions() {
+  public Set<NBATransition> getTransitions() {
     return transitions;
   }
 }

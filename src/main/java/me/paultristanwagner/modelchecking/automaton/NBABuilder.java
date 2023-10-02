@@ -1,22 +1,22 @@
 package me.paultristanwagner.modelchecking.automaton;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class NBABuilder {
 
-  private final List<String> states;
-  private final List<String> alphabet;
-  private final List<String> initialStates;
-  private final List<String> acceptingStates;
-  private final List<NBATransition> transitions;
+  private final Set<String> states;
+  private final Set<String> alphabet;
+  private final Set<String> initialStates;
+  private final Set<String> acceptingStates;
+  private final Set<NBATransition> transitions;
 
   public NBABuilder() {
-    this.states = new ArrayList<>();
-    this.alphabet = new ArrayList<>();
-    this.initialStates = new ArrayList<>();
-    this.acceptingStates = new ArrayList<>();
-    this.transitions = new ArrayList<>();
+    this.states = new HashSet<>();
+    this.alphabet = new HashSet<>();
+    this.initialStates = new HashSet<>();
+    this.acceptingStates = new HashSet<>();
+    this.transitions = new HashSet<>();
   }
 
   public NBABuilder addStates(String... states) {
@@ -32,7 +32,7 @@ public class NBABuilder {
     return this;
   }
 
-  public NBABuilder setAlphabet(List<String> alphabet) {
+  public NBABuilder setAlphabet(Set<String> alphabet) {
     this.alphabet.clear();
     this.alphabet.addAll(alphabet);
     return this;
