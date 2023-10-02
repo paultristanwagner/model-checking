@@ -5,7 +5,6 @@ import static me.paultristanwagner.modelchecking.ltl.LTLModelCheckingResult.mode
 import static me.paultristanwagner.modelchecking.ltl.formula.LTLIdentifierFormula.identifier;
 
 import java.util.*;
-import java.util.AbstractMap.SimpleEntry;
 import me.paultristanwagner.modelchecking.automaton.GNBA;
 import me.paultristanwagner.modelchecking.automaton.GNBABuilder;
 import me.paultristanwagner.modelchecking.automaton.NBA;
@@ -69,7 +68,7 @@ public class BasicLTLModelChecker implements LTLModelChecker {
   private GNBA computeGNBA(TransitionSystem ts, LTLFormula formula) {
     Set<String> atomicPropositions = new HashSet<>(ts.getAtomicPropositions());
     Set<LTLFormula> closure = formula.getClosure();
-    Set<Guess> elementarySets = computeElementarySets(atomicPropositions, closure);
+    Set<B> elementarySets = computeElementarySets(atomicPropositions, closure);
 
     GNBABuilder gnbaBuilder = new GNBABuilder();
 
@@ -80,12 +79,12 @@ public class BasicLTLModelChecker implements LTLModelChecker {
      * (1) always phi in B <=> phi in B and always phi in B'
      * (2) eventually phi in B <=> phi in B or eventually phi in B'
      */
-    for (Guess one : elementarySets) {
+    for (B one : elementarySets) {
       gnbaBuilder.addState(one.toString());
 
       Set<String> assumedAtomicPropositions = one.assumedAtomicPropositions();
 
-      for (Guess potentialSuccessor : elementarySets) {
+      for (B potentialSuccessor : elementarySets) {
         boolean violates = false;
         for (LTLFormula ltlFormula : closure) {
           if (ltlFormula instanceof LTLNextFormula nextFormula) {
@@ -146,7 +145,7 @@ public class BasicLTLModelChecker implements LTLModelChecker {
       if (ltlFormula instanceof LTLUntilFormula untilFormula) {
         Set<String> acceptingSet = new HashSet<>();
 
-        for (Guess state : elementarySets) {
+        for (B state : elementarySets) {
           if (!state.isAssumed(untilFormula) || state.isAssumed(untilFormula.getRight())) {
             acceptingSet.add(state.toString());
           }
@@ -155,7 +154,7 @@ public class BasicLTLModelChecker implements LTLModelChecker {
         gnbaBuilder.addAcceptingSet(acceptingSet);
       } else if (ltlFormula instanceof LTLEventuallyFormula eventuallyFormula) {
         Set<String> acceptingSet = new HashSet<>();
-        for (Guess state : elementarySets) {
+        for (B state : elementarySets) {
           if (!state.isAssumed(eventuallyFormula)
               || state.isAssumed(eventuallyFormula.getFormula())) {
             acceptingSet.add(state.toString());
@@ -164,7 +163,7 @@ public class BasicLTLModelChecker implements LTLModelChecker {
         gnbaBuilder.addAcceptingSet(acceptingSet);
       } else if (ltlFormula instanceof LTLAlwaysFormula alwaysFormula) {
         Set<String> acceptingSet = new HashSet<>();
-        for (Guess state : elementarySets) {
+        for (B state : elementarySets) {
           if (state.isAssumed(alwaysFormula) || !state.isAssumed(alwaysFormula.getFormula())) {
             acceptingSet.add(state.toString());
           }
@@ -173,7 +172,7 @@ public class BasicLTLModelChecker implements LTLModelChecker {
       }
     }
 
-    for (Guess elementarySet : elementarySets) {
+    for (B elementarySet : elementarySets) {
       if (elementarySet.isAssumed(formula)) {
         gnbaBuilder.addInitialState(elementarySet.toString());
       }
@@ -199,11 +198,9 @@ public class BasicLTLModelChecker implements LTLModelChecker {
     return reduced;
   }
 
-  private Set<Guess> computeElementarySets(
+  private Set<B> computeElementarySets(
       Set<String> atomicPropositions, Set<LTLFormula> closure) {
-    Set<Guess> elementarySets = new HashSet<>();
-
-    Assignment assignment = new Assignment();
+    Set<B> elementarySets = new HashSet<>();
 
     // todo: figure out what to do with this
     for (LTLFormula ltlFormula : closure) {
@@ -216,6 +213,7 @@ public class BasicLTLModelChecker implements LTLModelChecker {
       }
     }
 
+    // todo: ideally we would do model checking on the projection of the transition system
     // add all atomic propositions to the closure, even if they don't occur in the formula
     for (String atomicProposition : atomicPropositions) {
       LTLFormula atomicPropositionFormula = identifier(atomicProposition);
@@ -224,32 +222,34 @@ public class BasicLTLModelChecker implements LTLModelChecker {
 
     Set<LTLFormula> reduced = reduceClosure(closure);
 
-    while (true) {
-      Optional<LTLFormula> unassigned =
-          reduced.stream().filter(f -> !assignment.assignsFormulaOrNegation(f)).findFirst();
-      if (unassigned.isEmpty()) {
-        Guess guess = assignment.toB();
-        if (guess.isElementary(closure)) {
-          elementarySets.add(guess);
-        }
+    int n = reduced.size();
+    int m = 1 << n;
+    while(m > 0) {
+      m--;
 
-        boolean success = assignment.backtrack();
-        if (!success) {
-          break;
+      Set<LTLFormula> assumed = new HashSet<>();
+
+      int i = 0;
+      for (LTLFormula f : reduced) {
+        if((m & (1 << i)) != 0) {
+          assumed.add(f);
         }
-      } else {
-        LTLFormula f = unassigned.get();
-        assignment.assign(f, true);
+        i++;
+      }
+
+      B b = new B(assumed);
+      if (b.isElementary(closure)) {
+        elementarySets.add(b);
       }
     }
 
     return elementarySets;
   }
 
-  static class Guess {
+  static class B {
     private final Set<LTLFormula> assumedSubformulas;
 
-    Guess(Set<LTLFormula> assumedSubformulas) {
+    B(Set<LTLFormula> assumedSubformulas) {
       this.assumedSubformulas = assumedSubformulas;
     }
 
@@ -382,72 +382,6 @@ public class BasicLTLModelChecker implements LTLModelChecker {
     @Override
     public String toString() {
       return assumedSubformulas.toString();
-    }
-  }
-
-  static class Assignment {
-
-    private final Map<LTLFormula, Boolean> assignments;
-    private final Stack<SimpleEntry<LTLFormula, Boolean>> decisionStack;
-
-    Assignment() {
-      this.assignments = new HashMap<>();
-      this.decisionStack = new Stack<>();
-    }
-
-    boolean assignsFormulaOrNegation(LTLFormula formula) {
-      return assignments.containsKey(formula) || assignments.containsKey(formula.negate());
-    }
-
-    boolean get(LTLFormula formula) {
-      return assignments.get(formula);
-    }
-
-    void assign(LTLFormula formula, boolean value) {
-      assignments.put(formula, value);
-      decisionStack.push(new SimpleEntry<>(formula, false));
-    }
-
-    private void reassign(LTLFormula formula, boolean value) {
-      assignments.put(formula, value);
-      decisionStack.push(new SimpleEntry<>(formula, true));
-    }
-
-    boolean backtrack() {
-      while (!decisionStack.isEmpty()) {
-        SimpleEntry<LTLFormula, Boolean> lastDecision = decisionStack.pop();
-        if (lastDecision.getValue()) {
-          assignments.remove(lastDecision.getKey());
-        } else {
-          reassign(lastDecision.getKey(), !get(lastDecision.getKey()));
-          return true;
-        }
-      }
-
-      return false;
-    }
-
-    Guess toB() {
-      Set<LTLFormula> assumedSubformulas = new HashSet<>();
-      for (LTLFormula formula : assignments.keySet()) {
-        if (get(formula)) {
-          assumedSubformulas.add(formula);
-        }
-      }
-
-      return new Guess(assumedSubformulas);
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder sb = new StringBuilder();
-      for (SimpleEntry<LTLFormula, Boolean> decision : decisionStack) {
-        boolean value = get(decision.getKey());
-        int valueInt = value ? 1 : 0;
-        sb.append(decision.getKey().toString()).append("=").append(valueInt).append("; ");
-      }
-
-      return sb.toString();
     }
   }
 }
