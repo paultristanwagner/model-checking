@@ -2,27 +2,15 @@ package me.paultristanwagner.modelchecking.ts;
 
 import static me.paultristanwagner.modelchecking.ts.TSPersistenceResult.notPersistent;
 import static me.paultristanwagner.modelchecking.ts.TSPersistenceResult.persistent;
+import static me.paultristanwagner.modelchecking.util.GsonUtil.GSON;
 import static me.paultristanwagner.modelchecking.util.TupleUtil.stringTuple;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
 import me.paultristanwagner.modelchecking.automaton.NBA;
 import me.paultristanwagner.modelchecking.automaton.NBATransition;
-import me.paultristanwagner.modelchecking.ts.TSTransition.TSTransitionAdapter;
 
 public class TransitionSystem {
-
-  private static final Gson GSON;
-
-  static {
-    GSON =
-        new GsonBuilder()
-            .registerTypeAdapter(TSTransition.class, new TSTransitionAdapter())
-            .setPrettyPrinting()
-            .create();
-  }
 
   private final Set<String> states;
   private final Set<TSTransition> transitions;
@@ -70,7 +58,7 @@ public class TransitionSystem {
         states, transitions, initialStates, atomicPropositions, labelingFunction);
   }
 
-  public TransitionSystem reachableSynchronousProduct(NBA nba) {
+  public TransitionSystem reachableSynchronousProduct(NBA<Set<String>> nba) {
     TransitionSystemBuilder builder = new TransitionSystemBuilder();
 
     for (String state : nba.getStates()) {
@@ -81,7 +69,7 @@ public class TransitionSystem {
     for (String initialState : initialStates) {
       Set<String> label = labelingFunction.get(initialState);
 
-      for (NBATransition nbaTransition : nba.getTransitions()) {
+      for (NBATransition<Set<String>> nbaTransition : nba.getTransitions()) {
         String q0 = nbaTransition.getFrom();
         if (!nba.getInitialStates().contains(q0)) {
           continue;
@@ -89,17 +77,7 @@ public class TransitionSystem {
 
         String q = nbaTransition.getTo();
 
-        String a = nbaTransition.getAction();
-        String b = label.toString();
-
-        // todo: make this more efficient
-        Set<String> left = new HashSet<>(Arrays.asList(a.substring(1, a.length() - 1).split(", ")));
-        Set<String> right =
-            new HashSet<>(Arrays.asList(b.substring(1, b.length() - 1).split(", ")));
-
-        boolean actionMatches = left.equals(right);
-
-        if (!actionMatches) {
+        if (!nbaTransition.getAction().equals(label)) {
           continue;
         }
 
@@ -123,8 +101,7 @@ public class TransitionSystem {
 
       for (String sSuccessor : sSuccessors) {
         Set<String> sSuccessorLabel = labelingFunction.get(sSuccessor);
-        String sSuccessorLabelString = sSuccessorLabel.toString();
-        Set<String> qSuccessors = nba.getSuccessors(q, sSuccessorLabelString);
+        Set<String> qSuccessors = nba.getSuccessors(q, sSuccessorLabel);
         for (String qSuccessor : qSuccessors) {
 
           String from = stringTuple(s, q);
@@ -217,6 +194,15 @@ public class TransitionSystem {
     }
 
     return persistent();
+  }
+
+  public void addAtomicProposition(String atomicProposition) {
+    atomicPropositions.add(atomicProposition);
+  }
+
+  public void removeAtomicProposition(String atomicProposition) {
+    atomicPropositions.remove(atomicProposition);
+    labelingFunction.forEach((state, labels) -> labels.remove(atomicProposition));
   }
 
   public String introduceFreshAtomicProposition() {

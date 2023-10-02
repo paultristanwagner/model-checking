@@ -3,13 +3,13 @@ package me.paultristanwagner.modelchecking.automaton;
 import java.util.HashSet;
 import java.util.Set;
 
-public class NBABuilder {
+public class NBABuilder<ActionType> {
 
   private final Set<String> states;
   private final Set<String> alphabet;
   private final Set<String> initialStates;
   private final Set<String> acceptingStates;
-  private final Set<NBATransition> transitions;
+  private final Set<NBATransition<ActionType>> transitions;
 
   public NBABuilder() {
     this.states = new HashSet<>();
@@ -19,7 +19,7 @@ public class NBABuilder {
     this.transitions = new HashSet<>();
   }
 
-  public NBABuilder addStates(String... states) {
+  public NBABuilder<ActionType> addStates(String... states) {
     for (String state : states) {
       addState(state);
     }
@@ -27,33 +27,33 @@ public class NBABuilder {
     return this;
   }
 
-  public NBABuilder addState(String state) {
+  public NBABuilder<ActionType> addState(String state) {
     this.states.add(state);
     return this;
   }
 
-  public NBABuilder setAlphabet(Set<String> alphabet) {
+  public NBABuilder<ActionType> setAlphabet(Set<String> alphabet) {
     this.alphabet.clear();
     this.alphabet.addAll(alphabet);
     return this;
   }
 
-  public NBABuilder addInitialState(String initialState) {
+  public NBABuilder<ActionType> addInitialState(String initialState) {
     this.initialStates.add(initialState);
     return this;
   }
 
-  public NBABuilder addAcceptingState(String acceptingState) {
+  public NBABuilder<ActionType> addAcceptingState(String acceptingState) {
     this.acceptingStates.add(acceptingState);
     return this;
   }
 
-  public NBABuilder addTransition(String from, String action, String to) {
+  public NBABuilder<ActionType> addTransition(String from, ActionType action, String to) {
     this.transitions.add(NBATransition.of(from, action, to));
     return this;
   }
 
-  public NBA build() {
+  public NBA<ActionType> build() {
     return new NBA(states, alphabet, initialStates, acceptingStates, transitions);
   }
 }

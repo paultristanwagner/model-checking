@@ -3,13 +3,13 @@ package me.paultristanwagner.modelchecking.automaton;
 import java.util.HashSet;
 import java.util.Set;
 
-public class GNBABuilder {
+public class GNBABuilder<ActionType> {
 
   private final Set<String> states;
   private final Set<String> alphabet;
   private final Set<String> initialStates;
   private final Set<Set<String>> acceptingSets;
-  private final Set<NBATransition> transitions;
+  private final Set<NBATransition<ActionType>> transitions;
 
   public GNBABuilder() {
     this.states = new HashSet<>();
@@ -19,7 +19,7 @@ public class GNBABuilder {
     this.transitions = new HashSet<>();
   }
 
-  public GNBABuilder addStates(String... states) {
+  public GNBABuilder<ActionType> addStates(String... states) {
     for (String state : states) {
       addState(state);
     }
@@ -27,33 +27,33 @@ public class GNBABuilder {
     return this;
   }
 
-  public GNBABuilder addState(String state) {
+  public GNBABuilder<ActionType> addState(String state) {
     this.states.add(state);
     return this;
   }
 
-  public GNBABuilder setAlphabet(Set<String> alphabet) {
+  public GNBABuilder<ActionType> setAlphabet(Set<String> alphabet) {
     this.alphabet.clear();
     this.alphabet.addAll(alphabet);
     return this;
   }
 
-  public GNBABuilder addInitialState(String initialState) {
+  public GNBABuilder<ActionType> addInitialState(String initialState) {
     this.initialStates.add(initialState);
     return this;
   }
 
-  public GNBABuilder addAcceptingSet(Set<String> acceptingSet) {
+  public GNBABuilder<ActionType> addAcceptingSet(Set<String> acceptingSet) {
     this.acceptingSets.add(new HashSet<>(acceptingSet));
     return this;
   }
 
-  public GNBABuilder addTransition(String from, String action, String to) {
+  public GNBABuilder<ActionType> addTransition(String from, ActionType action, String to) {
     this.transitions.add(NBATransition.of(from, action, to));
     return this;
   }
 
-  public GNBA build() {
-    return new GNBA(states, alphabet, initialStates, acceptingSets, transitions);
+  public GNBA<ActionType> build() {
+    return new GNBA<>(states, alphabet, initialStates, acceptingSets, transitions);
   }
 }

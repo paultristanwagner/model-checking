@@ -1,72 +1,89 @@
 package me.paultristanwagner.modelchecking.automaton;
 
+import static me.paultristanwagner.modelchecking.util.GsonUtil.GSON;
+import static me.paultristanwagner.modelchecking.util.Pair.pair;
 import static me.paultristanwagner.modelchecking.util.TupleUtil.stringTuple;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import java.lang.reflect.Type;
 import java.util.*;
+
+import com.google.gson.annotations.SerializedName;
 import me.paultristanwagner.modelchecking.ts.CyclePath;
+import me.paultristanwagner.modelchecking.util.Pair;
 
-public class NBA {
-
-  private static final Gson GSON;
-
-  static {
-    GSON =
-        new GsonBuilder()
-            .registerTypeAdapter(NBATransition.class, new NBATransition.NBATransitionAdapter())
-            .setPrettyPrinting()
-            .create();
-  }
+public class NBA<ActionType> {
 
   private final Set<String> states;
   private final Set<String> alphabet;
   private final Set<String> initialStates;
   private final Set<String> acceptingStates;
-  private final Set<NBATransition> transitions;
+  private final Set<NBATransition<ActionType>> transitions;
+
+  private final transient Map<String, Set<String>> successorCache;
+  private final transient Map<Pair<String, ActionType>, Set<String>> successorActionCache;
+
+  private NBA() {
+    this.states = new HashSet<>();
+    this.alphabet = new HashSet<>();
+    this.initialStates = new HashSet<>();
+    this.acceptingStates = new HashSet<>();
+    this.transitions = new HashSet<>();
+
+    this.successorCache = new HashMap<>();
+    this.successorActionCache = new HashMap<>();
+  }
 
   public NBA(
       Set<String> states,
       Set<String> alphabet,
       Set<String> initialStates,
       Set<String> acceptingStates,
-      Set<NBATransition> transitions) {
+      Set<NBATransition<ActionType>> transitions) {
     this.states = states;
     this.alphabet = alphabet;
     this.initialStates = initialStates;
     this.acceptingStates = acceptingStates;
     this.transitions = transitions;
+
+    this.successorCache = new HashMap<>();
+    this.successorActionCache = new HashMap<>();
   }
 
   public Set<String> getSuccessors(String state) {
+    if(successorCache.containsKey(state)) {
+      return successorCache.get(state);
+    }
+
     Set<String> successors = new HashSet<>();
-    for (NBATransition transition : transitions) {
+    for (NBATransition<ActionType> transition : transitions) {
       if (transition.getFrom().equals(state)) {
         successors.add(transition.getTo());
       }
     }
+
+    successorCache.put(state, successors);
+
     return successors;
   }
 
-  public Set<String> getSuccessors(String state, String action) {
+  public Set<String> getSuccessors(String state, ActionType action) {
+    if(successorActionCache.containsKey(pair(state, action))) {
+      return successorActionCache.get(pair(state, action));
+    }
+
     Set<String> successors = new HashSet<>();
-    for (NBATransition transition : transitions) {
+    for (NBATransition<ActionType> transition : transitions) {
       if (!transition.getFrom().equals(state)) {
         continue;
       }
 
-      // todo: make this more efficient
-      String a = transition.getAction();
-      String b = action;
-      Set<String> left = new HashSet<>(Arrays.asList(a.substring(1, a.length() - 1).split(", ")));
-      Set<String> right = new HashSet<>(Arrays.asList(b.substring(1, b.length() - 1).split(", ")));
-
-      boolean actionMatches = left.equals(right);
-
-      if (actionMatches) {
+      if (transition.getAction().equals(action)) {
         successors.add(transition.getTo());
       }
     }
+
+    successorActionCache.put(pair(state, action), successors);
+
     return successors;
   }
 
@@ -137,20 +154,20 @@ public class NBA {
     return NBAEmptinessResult.empty();
   }
 
-  public GNBA toGNBA() {
+  public GNBA<ActionType> toGNBA() {
     Set<String> states = new HashSet<>(this.states);
     Set<String> alphabet = new HashSet<>(this.alphabet);
     Set<String> initialStates = new HashSet<>(this.initialStates);
-    Set<NBATransition> transitions = new HashSet<>(this.transitions);
+    Set<NBATransition<ActionType>> transitions = new HashSet<>(this.transitions);
 
     Set<Set<String>> acceptingSets = new HashSet<>();
     acceptingSets.add(new HashSet<>(this.acceptingStates));
 
-    return new GNBA(states, alphabet, initialStates, acceptingSets, transitions);
+    return new GNBA<>(states, alphabet, initialStates, acceptingSets, transitions);
   }
 
-  public GNBA product(NBA other) {
-    GNBABuilder builder = new GNBABuilder();
+  public GNBA<ActionType> product(NBA<ActionType> other) {
+    GNBABuilder<ActionType> builder = new GNBABuilder<>();
     builder.setAlphabet(alphabet);
 
     for (String state1 : states) {
@@ -167,8 +184,8 @@ public class NBA {
       }
     }
 
-    for (NBATransition transition : transitions) {
-      for (NBATransition otherTransition : other.transitions) {
+    for (NBATransition<ActionType> transition : transitions) {
+      for (NBATransition<ActionType> otherTransition : other.transitions) {
         if (!transition.getAction().equals(otherTransition.getAction())) {
           continue;
         }
@@ -205,8 +222,8 @@ public class NBA {
     return GSON.toJson(this);
   }
 
-  public static NBA fromJson(String json) {
-    return GSON.fromJson(json, NBA.class);
+  public static <ActionType> NBA<ActionType> fromJson(String json, Type type) {
+    return GSON.fromJson(json, type);
   }
 
   public Set<String> getStates() {
@@ -225,7 +242,7 @@ public class NBA {
     return acceptingStates;
   }
 
-  public Set<NBATransition> getTransitions() {
+  public Set<NBATransition<ActionType>> getTransitions() {
     return transitions;
   }
 }

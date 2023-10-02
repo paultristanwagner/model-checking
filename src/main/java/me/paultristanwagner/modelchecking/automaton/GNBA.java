@@ -1,27 +1,26 @@
 package me.paultristanwagner.modelchecking.automaton;
 
+import static me.paultristanwagner.modelchecking.util.GsonUtil.GSON;
 import static me.paultristanwagner.modelchecking.util.TupleUtil.stringTuple;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.Set;
 
-public final class GNBA {
+public class GNBA<ActionType> {
 
-  private static final Gson GSON;
   private final Set<String> states;
   private final Set<String> alphabet;
   private final Set<String> initialStates;
   private final Set<Set<String>> acceptingSets;
-  private final Set<NBATransition> transitions;
+  private final Set<NBATransition<ActionType>> transitions;
 
   public GNBA(
       Set<String> states,
       Set<String> alphabet,
       Set<String> initialStates,
       Set<Set<String>> acceptingSets,
-      Set<NBATransition> transitions) {
+      Set<NBATransition<ActionType>> transitions) {
     this.states = states;
     this.alphabet = alphabet;
     this.initialStates = initialStates;
@@ -29,17 +28,9 @@ public final class GNBA {
     this.transitions = transitions;
   }
 
-  static {
-    GSON =
-        new GsonBuilder()
-            .registerTypeAdapter(NBATransition.class, new NBATransition.NBATransitionAdapter())
-            .setPrettyPrinting()
-            .create();
-  }
-
   public Set<String> getSuccessors(String state) {
     Set<String> successors = new HashSet<>();
-    for (NBATransition transition : transitions) {
+    for (NBATransition<ActionType> transition : transitions) {
       if (transition.getFrom().equals(state)) {
         successors.add(transition.getTo());
       }
@@ -49,7 +40,7 @@ public final class GNBA {
 
   public Set<String> getSuccessors(String state, String action) {
     Set<String> successors = new HashSet<>();
-    for (NBATransition transition : transitions) {
+    for (NBATransition<ActionType> transition : transitions) {
       if (transition.getFrom().equals(state) && transition.getAction().equals(action)) {
         successors.add(transition.getTo());
       }
@@ -57,12 +48,12 @@ public final class GNBA {
     return successors;
   }
 
-  public NBA convertToNBA() {
+  public NBA<ActionType> convertToNBA() {
     if (acceptingSets.size() <= 1) {
       return getCanonicalNBA();
     }
 
-    NBABuilder builder = new NBABuilder();
+    NBABuilder<ActionType> builder = new NBABuilder<>();
     builder.setAlphabet(alphabet);
 
     for (String state : states) {
@@ -85,7 +76,7 @@ public final class GNBA {
       }
     }
 
-    for (NBATransition transition : transitions) {
+    for (NBATransition<ActionType> transition : transitions) {
       int i = 0;
       for (Set<String> acceptingSet : acceptingSets) {
         String nbaFrom = stringTuple(transition.getFrom(), i + 1);
@@ -104,12 +95,12 @@ public final class GNBA {
     return builder.build();
   }
 
-  private NBA getCanonicalNBA() {
+  private NBA<ActionType> getCanonicalNBA() {
     if (acceptingSets.size() > 1) {
       throw new IllegalStateException("GNBA has more than one accepting set");
     }
 
-    NBABuilder builder = new NBABuilder();
+    NBABuilder<ActionType> builder = new NBABuilder<>();
     builder.setAlphabet(alphabet);
     for (String state : states) {
       builder.addState(state);
@@ -129,7 +120,7 @@ public final class GNBA {
       }
     }
 
-    for (NBATransition transition : transitions) {
+    for (NBATransition<ActionType> transition : transitions) {
       builder.addTransition(transition.getFrom(), transition.getAction(), transition.getTo());
     }
 
@@ -140,8 +131,8 @@ public final class GNBA {
     return GSON.toJson(this);
   }
 
-  public static GNBA fromJson(String json) {
-    return GSON.fromJson(json, GNBA.class);
+  public static <ActionType> GNBA<ActionType> fromJson(String json, Type type) {
+    return GSON.fromJson(json, type);
   }
 
   public Set<String> getStates() {
@@ -160,7 +151,7 @@ public final class GNBA {
     return acceptingSets;
   }
 
-  public Set<NBATransition> getTransitions() {
+  public Set<NBATransition<ActionType>> getTransitions() {
     return transitions;
   }
 }

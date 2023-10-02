@@ -24,7 +24,7 @@ import me.paultristanwagner.modelchecking.parse.TokenType;
 
 public class LTLParser implements Parser<LTLFormula> {
 
-  // todo: add logical operators for implication and equivalence
+  // todo: add logical operators for equivalence
 
   /*
    * LTL Grammar:

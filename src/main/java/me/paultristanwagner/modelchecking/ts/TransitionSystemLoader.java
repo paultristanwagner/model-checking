@@ -1,22 +1,13 @@
 package me.paultristanwagner.modelchecking.ts;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import static me.paultristanwagner.modelchecking.util.GsonUtil.GSON;
+
+import com.google.gson.reflect.TypeToken;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
 public class TransitionSystemLoader {
-
-  private static final Gson GSON;
-
-  static {
-    GSON =
-        new GsonBuilder()
-            .registerTypeAdapter(TSTransition.class, new TSTransition.TSTransitionAdapter())
-            .setPrettyPrinting()
-            .create();
-  }
 
   public static TransitionSystem load(String path) throws IOException {
     File file = new File(path);
@@ -29,6 +20,6 @@ public class TransitionSystemLoader {
   }
 
   public static TransitionSystem fromJson(String string) {
-    return GSON.fromJson(string, TransitionSystem.class);
+    return GSON.fromJson(string, new TypeToken<TransitionSystem>() {}.getType());
   }
 }

@@ -19,11 +19,25 @@ public class BasicLTLModelChecker implements LTLModelChecker {
   public LTLModelCheckingResult check(TransitionSystem ts, LTLFormula formula) {
     ts = ts.copy();
 
+    // Ensure that the transition system contains only the mentioned atomic propositions
+    Set<String> remaining = new HashSet<>(ts.getAtomicPropositions());
+    for (LTLFormula subformula : formula.getAllSubformulas()) {
+      if (subformula instanceof LTLIdentifierFormula identifierFormula) {
+        String identifier = identifierFormula.getIdentifier();
+        remaining.remove(identifier);
+        ts.addAtomicProposition(identifier);
+      }
+    }
+
+    for (String ap : remaining) {
+      ts.removeAtomicProposition(ap);
+    }
+
     LTLFormula negation = formula.negate();
 
-    GNBA gnba = computeGNBA(ts, negation);
+    GNBA<Set<String>> gnba = computeGNBA(ts, negation);
 
-    NBA nba = gnba.convertToNBA();
+    NBA<Set<String>> nba = gnba.convertToNBA();
     TransitionSystem synchronousProduct = ts.reachableSynchronousProduct(nba);
 
     Set<String> persistentStates = new HashSet<>(nba.getStates());
@@ -65,12 +79,12 @@ public class BasicLTLModelChecker implements LTLModelChecker {
     return result;
   }
 
-  private GNBA computeGNBA(TransitionSystem ts, LTLFormula formula) {
+  private GNBA<Set<String>> computeGNBA(TransitionSystem ts, LTLFormula formula) {
     Set<String> atomicPropositions = new HashSet<>(ts.getAtomicPropositions());
     Set<LTLFormula> closure = formula.getClosure();
     Set<B> elementarySets = computeElementarySets(atomicPropositions, closure);
 
-    GNBABuilder gnbaBuilder = new GNBABuilder();
+    GNBABuilder<Set<String>> gnbaBuilder = new GNBABuilder<>();
 
     /*
      * Compute the states and transitions of the GNBA
@@ -130,8 +144,9 @@ public class BasicLTLModelChecker implements LTLModelChecker {
         if (violates) {
           continue;
         }
+
         gnbaBuilder.addTransition(
-            one.toString(), assumedAtomicPropositions.toString(), potentialSuccessor.toString());
+            one.toString(), assumedAtomicPropositions, potentialSuccessor.toString());
       }
     }
 

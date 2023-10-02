@@ -1,7 +1,9 @@
 package me.paultristanwagner.modelchecking;
 
+import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Set;
 import me.paultristanwagner.modelchecking.automaton.NBA;
 import me.paultristanwagner.modelchecking.ts.TransitionSystem;
 import me.paultristanwagner.modelchecking.ts.TransitionSystemLoader;
@@ -20,7 +22,7 @@ public class SynchronousProductTest {
     InputStream nbaInputStream =
         getClass().getClassLoader().getResourceAsStream("nba_never_delivered.json");
     String nbaJson = new String(nbaInputStream.readAllBytes());
-    NBA nba = NBA.fromJson(nbaJson);
+    NBA<Set<String>> nba = NBA.fromJson(nbaJson, new TypeToken<NBA<Set<String>>>() {}.getType());
 
     TransitionSystem result = ts.reachableSynchronousProduct(nba);
     Assertions.assertNotNull(result);

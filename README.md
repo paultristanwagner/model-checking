@@ -163,7 +163,7 @@ at: [paultristanwagner@gmail.com](mailto:paultristanwagner@gmail.com).
 
 - Improve UI / UX
 - Implement implication and equivalence operators in LTL, CTL, and CTL* grammar
-- Implement bisimulation quotienting algorithm 
+- Implement bisimulation quotienting algorithm
 - Write tests for the LTL, CTL, and CTL* model checking algorithms
 - Optimize the lookup of the next states in the transition system
 - Implement linear-time fixpoint computation in CTL model checking
