@@ -1,6 +1,6 @@
 package me.paultristanwagner.modelchecking.ltl.formula;
 
-import static me.paultristanwagner.modelchecking.util.Symbol.AND_SYMBOL;
+import static me.paultristanwagner.modelchecking.util.Symbol.AND;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,7 +45,7 @@ public class LTLAndFormula extends LTLFormula {
 
       if (i < components.size() - 1) {
         builder.append(" ");
-        builder.append(AND_SYMBOL);
+        builder.append(AND);
         builder.append(" ");
       }
     }

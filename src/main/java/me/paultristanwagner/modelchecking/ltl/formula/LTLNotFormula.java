@@ -1,6 +1,6 @@
 package me.paultristanwagner.modelchecking.ltl.formula;
 
-import static me.paultristanwagner.modelchecking.util.Symbol.NOT_SYMBOL;
+import static me.paultristanwagner.modelchecking.util.Symbol.NOT;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,9 +33,9 @@ public class LTLNotFormula extends LTLFormula {
   @Override
   public String toString() {
     if (formula instanceof LTLAndFormula || formula instanceof LTLOrFormula) {
-      return NOT_SYMBOL + "(" + formula + ")";
+      return NOT + "(" + formula + ")";
     }
-    return NOT_SYMBOL + formula;
+    return NOT + formula;
   }
 
   @Override

@@ -1,6 +1,6 @@
 package me.paultristanwagner.modelchecking.ctlstar.formula;
 
-import static me.paultristanwagner.modelchecking.util.Symbol.EXISTENTIAL_QUANTIFIER_SYMBOL;
+import static me.paultristanwagner.modelchecking.util.Symbol.EXISTENTIAL_QUANTIFIER;
 
 import java.util.Objects;
 import java.util.Set;
@@ -51,7 +51,7 @@ public class CTLStarExistsFormula extends CTLStarFormula {
 
   @Override
   public String toString() {
-    return EXISTENTIAL_QUANTIFIER_SYMBOL + formula;
+    return EXISTENTIAL_QUANTIFIER + formula;
   }
 
   @Override

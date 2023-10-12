@@ -5,10 +5,9 @@ import static me.paultristanwagner.modelchecking.ltl.LTLModelCheckingResult.mode
 import static me.paultristanwagner.modelchecking.ltl.formula.LTLIdentifierFormula.identifier;
 
 import java.util.*;
-import me.paultristanwagner.modelchecking.automaton.GNBA;
-import me.paultristanwagner.modelchecking.automaton.GNBABuilder;
-import me.paultristanwagner.modelchecking.automaton.NBA;
+import me.paultristanwagner.modelchecking.automaton.*;
 import me.paultristanwagner.modelchecking.ltl.formula.*;
+import me.paultristanwagner.modelchecking.ts.BasicTransitionSystem;
 import me.paultristanwagner.modelchecking.ts.CyclePath;
 import me.paultristanwagner.modelchecking.ts.TSPersistenceResult;
 import me.paultristanwagner.modelchecking.ts.TransitionSystem;
@@ -16,7 +15,7 @@ import me.paultristanwagner.modelchecking.ts.TransitionSystem;
 public class BasicLTLModelChecker implements LTLModelChecker {
 
   @Override
-  public LTLModelCheckingResult check(TransitionSystem ts, LTLFormula formula) {
+  public LTLModelCheckingResult check(BasicTransitionSystem ts, LTLFormula formula) {
     ts = ts.copy();
 
     // Ensure that the transition system contains only the mentioned atomic propositions
@@ -38,9 +37,9 @@ public class BasicLTLModelChecker implements LTLModelChecker {
     GNBA<Set<String>> gnba = computeGNBA(ts, negation);
 
     NBA<Set<String>> nba = gnba.convertToNBA();
-    TransitionSystem synchronousProduct = ts.reachableSynchronousProduct(nba);
+    TransitionSystem<State> synchronousProduct = ts.reachableSynchronousProduct(nba);
 
-    Set<String> persistentStates = new HashSet<>(nba.getStates());
+    Set<State> persistentStates = new HashSet<>(nba.getStates());
     nba.getAcceptingStates().forEach(persistentStates::remove);
 
     TSPersistenceResult result = synchronousProduct.checkPersistence(persistentStates);
@@ -53,21 +52,21 @@ public class BasicLTLModelChecker implements LTLModelChecker {
   }
 
   @Override
-  public Set<String> sat(TransitionSystem ts, LTLFormula formula) {
-    Set<String> result = new HashSet<>();
+  public Set<State> sat(BasicTransitionSystem ts, LTLFormula formula) {
+    Set<State> result = new HashSet<>();
 
     LTLFormula negation = formula.negate();
-    GNBA gnba = computeGNBA(ts, negation);
-    NBA nba = gnba.convertToNBA();
+    GNBA<Set<String>> gnba = computeGNBA(ts, negation);
+    NBA<Set<String>> nba = gnba.convertToNBA();
 
-    for (String state : ts.getStates()) {
-      TransitionSystem initial = ts.copy();
+    for (State state : ts.getStates()) {
+      TransitionSystem<String> initial = ts.copy();
       initial.clearInitialStates();
       initial.addInitialState(state);
 
-      TransitionSystem synchronousProduct = initial.reachableSynchronousProduct(nba);
+      TransitionSystem<State> synchronousProduct = initial.reachableSynchronousProduct(nba);
 
-      Set<String> persistentStates = new HashSet<>(nba.getStates());
+      Set<State> persistentStates = new HashSet<>(nba.getStates());
       nba.getAcceptingStates().forEach(persistentStates::remove);
 
       TSPersistenceResult persistenceResult = synchronousProduct.checkPersistence(persistentStates);
@@ -79,7 +78,7 @@ public class BasicLTLModelChecker implements LTLModelChecker {
     return result;
   }
 
-  private GNBA<Set<String>> computeGNBA(TransitionSystem ts, LTLFormula formula) {
+  private GNBA<Set<String>> computeGNBA(BasicTransitionSystem ts, LTLFormula formula) {
     Set<String> atomicPropositions = new HashSet<>(ts.getAtomicPropositions());
     Set<LTLFormula> closure = formula.getClosure();
     Set<B> elementarySets = computeElementarySets(atomicPropositions, closure);
@@ -94,7 +93,8 @@ public class BasicLTLModelChecker implements LTLModelChecker {
      * (2) eventually phi in B <=> phi in B or eventually phi in B'
      */
     for (B one : elementarySets) {
-      gnbaBuilder.addState(one.toString());
+      State state = new SetState<>(one.assumedSubformulas);
+      gnbaBuilder.addState(state);
 
       Set<String> assumedAtomicPropositions = one.assumedAtomicPropositions();
 
@@ -145,8 +145,9 @@ public class BasicLTLModelChecker implements LTLModelChecker {
           continue;
         }
 
-        gnbaBuilder.addTransition(
-            one.toString(), assumedAtomicPropositions, potentialSuccessor.toString());
+        State from = new SetState<>(one.assumedSubformulas);
+        State to = new SetState<>(potentialSuccessor.assumedSubformulas);
+        gnbaBuilder.addTransition(from, assumedAtomicPropositions, to);
       }
     }
 
@@ -158,29 +159,31 @@ public class BasicLTLModelChecker implements LTLModelChecker {
      */
     for (LTLFormula ltlFormula : closure) {
       if (ltlFormula instanceof LTLUntilFormula untilFormula) {
-        Set<String> acceptingSet = new HashSet<>();
+        Set<State> acceptingSet = new HashSet<>();
 
-        for (B state : elementarySets) {
-          if (!state.isAssumed(untilFormula) || state.isAssumed(untilFormula.getRight())) {
-            acceptingSet.add(state.toString());
+        for (B b : elementarySets) {
+          if (!b.isAssumed(untilFormula) || b.isAssumed(untilFormula.getRight())) {
+            State state = new SetState<>(b.assumedSubformulas);
+            acceptingSet.add(state);
           }
         }
 
         gnbaBuilder.addAcceptingSet(acceptingSet);
       } else if (ltlFormula instanceof LTLEventuallyFormula eventuallyFormula) {
-        Set<String> acceptingSet = new HashSet<>();
-        for (B state : elementarySets) {
-          if (!state.isAssumed(eventuallyFormula)
-              || state.isAssumed(eventuallyFormula.getFormula())) {
-            acceptingSet.add(state.toString());
+        Set<State> acceptingSet = new HashSet<>();
+        for (B b : elementarySets) {
+          if (!b.isAssumed(eventuallyFormula) || b.isAssumed(eventuallyFormula.getFormula())) {
+            State state = new SetState<>(b.assumedSubformulas);
+            acceptingSet.add(state);
           }
         }
         gnbaBuilder.addAcceptingSet(acceptingSet);
       } else if (ltlFormula instanceof LTLAlwaysFormula alwaysFormula) {
-        Set<String> acceptingSet = new HashSet<>();
-        for (B state : elementarySets) {
-          if (state.isAssumed(alwaysFormula) || !state.isAssumed(alwaysFormula.getFormula())) {
-            acceptingSet.add(state.toString());
+        Set<State> acceptingSet = new HashSet<>();
+        for (B b : elementarySets) {
+          if (b.isAssumed(alwaysFormula) || !b.isAssumed(alwaysFormula.getFormula())) {
+            State state = new SetState<>(b.assumedSubformulas);
+            acceptingSet.add(state);
           }
         }
         gnbaBuilder.addAcceptingSet(acceptingSet);
@@ -189,7 +192,8 @@ public class BasicLTLModelChecker implements LTLModelChecker {
 
     for (B elementarySet : elementarySets) {
       if (elementarySet.isAssumed(formula)) {
-        gnbaBuilder.addInitialState(elementarySet.toString());
+        State state = new SetState<>(elementarySet.assumedSubformulas);
+        gnbaBuilder.addInitialState(state);
       }
     }
 

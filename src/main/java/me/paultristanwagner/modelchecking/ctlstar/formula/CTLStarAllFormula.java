@@ -50,7 +50,7 @@ public class CTLStarAllFormula extends CTLStarFormula {
 
   @Override
   public String toString() {
-    return Symbol.UNIVERSAL_QUANTIFIER_SYMBOL + formula;
+    return Symbol.UNIVERSAL_QUANTIFIER + formula;
   }
 
   @Override

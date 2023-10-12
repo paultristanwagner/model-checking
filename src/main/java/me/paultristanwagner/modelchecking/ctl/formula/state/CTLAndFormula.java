@@ -1,6 +1,6 @@
 package me.paultristanwagner.modelchecking.ctl.formula.state;
 
-import static me.paultristanwagner.modelchecking.util.Symbol.AND_SYMBOL;
+import static me.paultristanwagner.modelchecking.util.Symbol.AND;
 
 import java.util.Arrays;
 import java.util.List;
@@ -33,7 +33,7 @@ public class CTLAndFormula extends CTLFormula {
 
       if (i < components.size() - 1) {
         builder.append(" ");
-        builder.append(AND_SYMBOL);
+        builder.append(AND);
         builder.append(" ");
       }
     }

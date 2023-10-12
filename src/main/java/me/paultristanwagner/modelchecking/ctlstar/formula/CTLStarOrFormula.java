@@ -1,6 +1,6 @@
 package me.paultristanwagner.modelchecking.ctlstar.formula;
 
-import static me.paultristanwagner.modelchecking.util.Symbol.OR_SYMBOL;
+import static me.paultristanwagner.modelchecking.util.Symbol.OR;
 
 import java.util.*;
 import me.paultristanwagner.modelchecking.ltl.formula.LTLFormula;
@@ -75,7 +75,7 @@ public class CTLStarOrFormula extends CTLStarFormula {
 
       if (i < components.size() - 1) {
         builder.append(" ");
-        builder.append(OR_SYMBOL);
+        builder.append(OR);
         builder.append(" ");
       }
     }

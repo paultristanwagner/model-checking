@@ -1,6 +1,6 @@
 package me.paultristanwagner.modelchecking.ltl.formula;
 
-import static me.paultristanwagner.modelchecking.util.Symbol.OR_SYMBOL;
+import static me.paultristanwagner.modelchecking.util.Symbol.OR;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +44,7 @@ public class LTLOrFormula extends LTLFormula {
 
       if (i < components.size() - 1) {
         builder.append(" ");
-        builder.append(OR_SYMBOL);
+        builder.append(OR);
         builder.append(" ");
       }
     }

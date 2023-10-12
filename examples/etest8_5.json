@@ -1,54 +1,17 @@
 {
-  "states": [
-    "s1",
-    "s2",
-    "s3",
-    "s4"
-  ],
-  "transitions": [
-    [
-      "s1",
-      "s2"
-    ],
-    [
-      "s1",
-      "s3"
-    ],
-    [
-      "s2",
-      "s4"
-    ],
-    [
-      "s3",
-      "s1"
-    ],
-    [
-      "s3",
-      "s4"
-    ],
-    [
-      "s4",
-      "s1"
-    ]
-  ],
-  "initialStates": [
-    "s1"
-  ],
-  "atomicPropositions": [
-    "a",
-    "b"
-  ],
+  "states": ["s1", "s2", "s3", "s4"],
+  "initialStates": ["s1"],
+  "successors": {
+    "s1": ["s2", "s3"],
+    "s2": ["s4"],
+    "s3": ["s1", "s4"],
+    "s4": ["s1"]
+  },
+  "atomicPropositions": ["a", "b"],
   "labelingFunction": {
-    "s3": [
-      "b"
-    ],
-    "s4": [
-      "a",
-      "b"
-    ],
     "s1": [],
-    "s2": [
-      "a"
-    ]
+    "s2": ["a"],
+    "s3": ["b"],
+    "s4": ["a", "b"]
   }
 }

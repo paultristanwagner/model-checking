@@ -33,25 +33,23 @@ Example: See examples/ts0.json
 
 ```
 {
-	"states": ["s0","s1","s2","s3","s4"],
-	"transitions": [
-		["s0","s1"],
-		["s1","s2"],
-		["s2","s3"],
-		["s3","s3"],
-		["s3","s0"],
-		["s0","s4"],
-		["s4","s4"]
-	],
-	"initialStates": ["s0","s3"],
-	"atomicPropositions": ["a","b"],
-	"labelingFunction": {
-		"s0": [],
-		"s1": ["a"],
-		"s2": ["a","b"],
-		"s3": ["b"],
-		"s4": ["b"]
-	}
+  "states": ["s0", "s1", "s2", "s3", "s4"],
+  "initialStates": ["s0", "s3"],
+  "successors": {
+    "s0": ["s1", "s4"],
+    "s1": ["s2"],
+    "s2": ["s3"],
+    "s3": ["s0", "s3"],
+    "s4": ["s4"]
+  },
+  "atomicPropositions": ["a", "b"],
+  "labelingFunction": {
+    "s0": [],
+    "s1": ["a"],
+    "s2": ["a", "b"],
+    "s3": ["b"],
+    "s4": ["b"]
+  }
 }
 ```
 

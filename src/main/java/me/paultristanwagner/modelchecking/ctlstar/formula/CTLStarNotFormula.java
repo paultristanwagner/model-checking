@@ -1,6 +1,6 @@
 package me.paultristanwagner.modelchecking.ctlstar.formula;
 
-import static me.paultristanwagner.modelchecking.util.Symbol.NOT_SYMBOL;
+import static me.paultristanwagner.modelchecking.util.Symbol.NOT;
 
 import java.util.Objects;
 import java.util.Set;
@@ -51,7 +51,7 @@ public class CTLStarNotFormula extends CTLStarFormula {
 
   @Override
   public String toString() {
-    return NOT_SYMBOL + formula;
+    return NOT + formula;
   }
 
   @Override

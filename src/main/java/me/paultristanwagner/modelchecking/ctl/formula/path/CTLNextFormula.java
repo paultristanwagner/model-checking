@@ -1,6 +1,6 @@
 package me.paultristanwagner.modelchecking.ctl.formula.path;
 
-import static me.paultristanwagner.modelchecking.util.Symbol.NEXT_SYMBOL;
+import static me.paultristanwagner.modelchecking.util.Symbol.NEXT;
 
 import me.paultristanwagner.modelchecking.ctl.formula.state.CTLFormula;
 import me.paultristanwagner.modelchecking.ctl.formula.state.CTLParenthesisFormula;
@@ -24,9 +24,9 @@ public class CTLNextFormula extends CTLPathFormula {
   @Override
   public String toString() {
     if (stateFormula instanceof CTLParenthesisFormula) {
-      return NEXT_SYMBOL + stateFormula;
+      return NEXT + stateFormula;
     } else {
-      return NEXT_SYMBOL + "(" + stateFormula + ")";
+      return NEXT + "(" + stateFormula + ")";
     }
   }
 }

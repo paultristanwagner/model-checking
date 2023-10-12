@@ -3,17 +3,18 @@ package me.paultristanwagner.modelchecking.ctlstar;
 import static me.paultristanwagner.modelchecking.ltl.formula.LTLNotFormula.not;
 
 import java.util.*;
+import me.paultristanwagner.modelchecking.automaton.State;
 import me.paultristanwagner.modelchecking.ctlstar.formula.*;
 import me.paultristanwagner.modelchecking.ltl.BasicLTLModelChecker;
 import me.paultristanwagner.modelchecking.ltl.LTLModelChecker;
 import me.paultristanwagner.modelchecking.ltl.formula.LTLFormula;
-import me.paultristanwagner.modelchecking.ts.TransitionSystem;
+import me.paultristanwagner.modelchecking.ts.BasicTransitionSystem;
 
 public class BasicCTLStarModelChecker implements CTLStarModelChecker {
 
   @Override
-  public CTLStarModelCheckingResult check(TransitionSystem ts, CTLStarFormula formula) {
-    ts = ts.copy();
+  public CTLStarModelCheckingResult check(BasicTransitionSystem ts, CTLStarFormula formula) {
+    ts = (BasicTransitionSystem) ts.copy();
     while (true) {
       Set<CTLStarFormula> stateSubFormulas = getNonTrivialMinimalStateSubFormulas(formula);
 
@@ -27,7 +28,7 @@ public class BasicCTLStarModelChecker implements CTLStarModelChecker {
       for (CTLStarFormula subFormula : stateSubFormulasList) {
         if (subFormula != formula && subFormula instanceof CTLStarIdentifierFormula) continue;
 
-        Set<String> satStates = sat(ts, subFormula);
+        Set<State> satStates = sat(ts, subFormula);
 
         if (subFormula == formula) {
           if (satStates.containsAll(ts.getInitialStates())) {
@@ -38,7 +39,7 @@ public class BasicCTLStarModelChecker implements CTLStarModelChecker {
         }
 
         String freshAtomicProposition = ts.introduceFreshAtomicProposition();
-        for (String satState : satStates) {
+        for (State satState : satStates) {
           ts.addLabel(satState, freshAtomicProposition);
         }
         formula.replaceFormula(subFormula, freshAtomicProposition);
@@ -47,7 +48,7 @@ public class BasicCTLStarModelChecker implements CTLStarModelChecker {
   }
 
   @Override
-  public Set<String> sat(TransitionSystem ts, CTLStarFormula formula) {
+  public Set<State> sat(BasicTransitionSystem ts, CTLStarFormula formula) {
     if (formula instanceof CTLStarTrueFormula) {
       return satTrue(ts);
     } else if (formula instanceof CTLStarFalseFormula) {
@@ -71,35 +72,35 @@ public class BasicCTLStarModelChecker implements CTLStarModelChecker {
     throw new UnsupportedOperationException();
   }
 
-  private Set<String> satExists(TransitionSystem ts, CTLStarExistsFormula existsFormula) {
+  private Set<State> satExists(BasicTransitionSystem ts, CTLStarExistsFormula existsFormula) {
     LTLModelChecker ltlModelChecker = new BasicLTLModelChecker();
     LTLFormula ltlFormula = existsFormula.getFormula().toLTL();
     LTLFormula negated = not(ltlFormula);
-    Set<String> negation = ltlModelChecker.sat(ts, negated);
-    Set<String> sat = new HashSet<>(ts.getStates());
+    Set<State> negation = ltlModelChecker.sat(ts, negated);
+    Set<State> sat = new HashSet<>(ts.getStates());
     sat.removeAll(negation);
     return sat;
   }
 
-  private Set<String> satAll(TransitionSystem ts, CTLStarAllFormula allFormula) {
+  private Set<State> satAll(BasicTransitionSystem ts, CTLStarAllFormula allFormula) {
     LTLModelChecker ltlModelChecker = new BasicLTLModelChecker();
     LTLFormula ltlFormula = allFormula.getFormula().toLTL();
     return ltlModelChecker.sat(ts, ltlFormula);
   }
 
-  private Set<String> satTrue(TransitionSystem ts) {
+  private Set<State> satTrue(BasicTransitionSystem ts) {
     return new HashSet<>(ts.getStates());
   }
 
-  private Set<String> satFalse(TransitionSystem ts) {
+  private Set<State> satFalse(BasicTransitionSystem ts) {
     return new HashSet<>();
   }
 
-  private Set<String> satIdentifier(TransitionSystem ts, CTLStarIdentifierFormula formula) {
+  private Set<State> satIdentifier(BasicTransitionSystem ts, CTLStarIdentifierFormula formula) {
     String atomicProposition = formula.getIdentifier();
 
-    Set<String> satStates = new HashSet<>();
-    for (String state : ts.getStates()) {
+    Set<State> satStates = new HashSet<>();
+    for (State state : ts.getStates()) {
       if (ts.getLabel(state).contains(atomicProposition)) {
         satStates.add(state);
       }
@@ -108,24 +109,24 @@ public class BasicCTLStarModelChecker implements CTLStarModelChecker {
     return satStates;
   }
 
-  private Set<String> satAnd(TransitionSystem ts, CTLStarAndFormula andFormula) {
-    Set<String> satStates = new HashSet<>(ts.getStates());
+  private Set<State> satAnd(BasicTransitionSystem ts, CTLStarAndFormula andFormula) {
+    Set<State> satStates = new HashSet<>(ts.getStates());
     for (CTLStarFormula component : andFormula.getComponents()) {
       satStates.retainAll(sat(ts, component));
     }
     return satStates;
   }
 
-  private Set<String> satOr(TransitionSystem ts, CTLStarOrFormula orFormula) {
-    Set<String> satStates = new HashSet<>();
+  private Set<State> satOr(BasicTransitionSystem ts, CTLStarOrFormula orFormula) {
+    Set<State> satStates = new HashSet<>();
     for (CTLStarFormula component : orFormula.getComponents()) {
       satStates.addAll(sat(ts, component));
     }
     return satStates;
   }
 
-  private Set<String> satNot(TransitionSystem ts, CTLStarNotFormula notFormula) {
-    Set<String> satStates = new HashSet<>(ts.getStates());
+  private Set<State> satNot(BasicTransitionSystem ts, CTLStarNotFormula notFormula) {
+    Set<State> satStates = new HashSet<>(ts.getStates());
     satStates.removeAll(sat(ts, notFormula.getFormula()));
     return satStates;
   }

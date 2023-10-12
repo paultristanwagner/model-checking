@@ -1,6 +1,6 @@
 package me.paultristanwagner.modelchecking.ctl.formula.state;
 
-import static me.paultristanwagner.modelchecking.util.Symbol.OR_SYMBOL;
+import static me.paultristanwagner.modelchecking.util.Symbol.OR;
 
 import java.util.Arrays;
 import java.util.List;
@@ -33,7 +33,7 @@ public class CTLOrFormula extends CTLFormula {
 
       if (i < components.size() - 1) {
         builder.append(" ");
-        builder.append(OR_SYMBOL);
+        builder.append(OR);
         builder.append(" ");
       }
     }

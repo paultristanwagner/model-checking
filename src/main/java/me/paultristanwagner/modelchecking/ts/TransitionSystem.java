@@ -3,34 +3,43 @@ package me.paultristanwagner.modelchecking.ts;
 import static me.paultristanwagner.modelchecking.ts.TSPersistenceResult.notPersistent;
 import static me.paultristanwagner.modelchecking.ts.TSPersistenceResult.persistent;
 import static me.paultristanwagner.modelchecking.util.GsonUtil.GSON;
-import static me.paultristanwagner.modelchecking.util.TupleUtil.stringTuple;
 
 import java.util.*;
-import java.util.AbstractMap.SimpleEntry;
+import java.util.List;
+import me.paultristanwagner.modelchecking.automaton.CompositeState;
 import me.paultristanwagner.modelchecking.automaton.NBA;
 import me.paultristanwagner.modelchecking.automaton.NBATransition;
+import me.paultristanwagner.modelchecking.automaton.State;
 
-public class TransitionSystem {
+public class TransitionSystem<APType> {
 
-  private final Set<String> states;
-  private final Set<TSTransition> transitions;
-  private final Set<String> initialStates;
-  private final Set<String> atomicPropositions;
-  private final Map<String, Set<String>> labelingFunction;
+  protected final Set<State> states;
+  protected final Map<State, Set<State>> successors;
+  protected final Set<State> initialStates;
+  protected final Set<APType> atomicPropositions;
+  protected final Map<State, Set<APType>> labelingFunction;
+
+  protected TransitionSystem() {
+    this.states = new HashSet<>();
+    this.successors = new HashMap<>();
+    this.initialStates = new HashSet<>();
+    this.atomicPropositions = new HashSet<>();
+    this.labelingFunction = new HashMap<>();
+  }
 
   public TransitionSystem(
-      Set<String> states,
-      Set<TSTransition> transitions,
-      Set<String> initialStates,
-      Set<String> atomicPropositions,
-      Map<String, Set<String>> labelingFunction) {
+      Set<State> states,
+      Map<State, Set<State>> successors,
+      Set<State> initialStates,
+      Set<APType> atomicPropositions,
+      Map<State, Set<APType>> labelingFunction) {
     this.states = states;
-    this.transitions = transitions;
+    this.successors = successors;
     this.initialStates = initialStates;
     this.atomicPropositions = atomicPropositions;
     this.labelingFunction = labelingFunction;
 
-    for (String state : states) {
+    for (State state : states) {
       labelingFunction.putIfAbsent(state, Set.of());
     }
   }
@@ -44,74 +53,74 @@ public class TransitionSystem {
         });
   }
 
-  public TransitionSystem copy() {
-    Set<String> states = new HashSet<>(this.states);
-    Set<TSTransition> transitions = new HashSet<>(this.transitions);
-    Set<String> initialStates = new HashSet<>(this.initialStates);
-    Set<String> atomicPropositions = new HashSet<>(this.atomicPropositions);
+  public TransitionSystem<APType> copy() {
+    Set<State> states = new HashSet<>(this.states);
+    Map<State, Set<State>> successors = new HashMap<>(this.successors);
+    Set<State> initialStates = new HashSet<>(this.initialStates);
+    Set<APType> atomicPropositions = new HashSet<>(this.atomicPropositions);
 
-    Map<String, Set<String>> labelingFunction = new HashMap<>();
+    Map<State, Set<APType>> labelingFunction = new HashMap<>();
     this.labelingFunction.forEach(
         (state, labels) -> labelingFunction.put(state, new HashSet<>(labels)));
 
-    return new TransitionSystem(
-        states, transitions, initialStates, atomicPropositions, labelingFunction);
+    return new TransitionSystem<>(
+        states, successors, initialStates, atomicPropositions, labelingFunction);
   }
 
-  public TransitionSystem reachableSynchronousProduct(NBA<Set<String>> nba) {
-    TransitionSystemBuilder builder = new TransitionSystemBuilder();
+  public TransitionSystem<State> reachableSynchronousProduct(NBA<Set<APType>> nba) {
+    TransitionSystemBuilder<State> builder = new TransitionSystemBuilder<>();
 
-    for (String state : nba.getStates()) {
+    for (State state : nba.getStates()) {
       builder.addAtomicProposition(state);
     }
 
-    Queue<SimpleEntry<String, String>> queue = new ArrayDeque<>();
-    for (String initialState : initialStates) {
-      Set<String> label = labelingFunction.get(initialState);
+    Queue<CompositeState> queue = new ArrayDeque<>();
+    for (State initialState : initialStates) {
+      Set<APType> label = labelingFunction.get(initialState);
 
-      for (NBATransition<Set<String>> nbaTransition : nba.getTransitions()) {
-        String q0 = nbaTransition.getFrom();
+      for (NBATransition<Set<APType>> nbaTransition :
+          nba.getTransitionFunction().getTransitions()) {
+        State q0 = nbaTransition.getFrom();
         if (!nba.getInitialStates().contains(q0)) {
           continue;
         }
 
-        String q = nbaTransition.getTo();
+        State q = nbaTransition.getTo();
 
         if (!nbaTransition.getAction().equals(label)) {
           continue;
         }
 
-        String resultState = stringTuple(initialState, q);
+        CompositeState resultState = State.composite(initialState, q);
         builder.addState(resultState);
         builder.addLabel(resultState, q);
         builder.addInitialState(resultState);
-        queue.add(new SimpleEntry<>(initialState, q));
+        queue.add(resultState);
       }
     }
 
-    Set<SimpleEntry<String, String>> visited = new HashSet<>();
+    Set<CompositeState> visited = new HashSet<>();
 
     while (!queue.isEmpty()) {
-      SimpleEntry<String, String> state = queue.poll();
+      CompositeState state = queue.poll();
       visited.add(state);
-      String s = state.getKey();
+      State s = state.getLeft();
 
-      String q = state.getValue();
-      List<String> sSuccessors = getSuccessors(s);
+      State q = (State) state.getRight();
+      Set<State> sSuccessors = getSuccessors(s);
 
-      for (String sSuccessor : sSuccessors) {
-        Set<String> sSuccessorLabel = labelingFunction.get(sSuccessor);
-        Set<String> qSuccessors = nba.getSuccessors(q, sSuccessorLabel);
-        for (String qSuccessor : qSuccessors) {
+      for (State sSuccessor : sSuccessors) {
+        Set<APType> sSuccessorLabel = labelingFunction.get(sSuccessor);
+        Set<State> qSuccessors = nba.getSuccessors(q, sSuccessorLabel);
+        for (State qSuccessor : qSuccessors) {
 
-          String from = stringTuple(s, q);
-          String to = stringTuple(sSuccessor, qSuccessor);
+          CompositeState from = State.composite(s, q);
+          CompositeState to = State.composite(sSuccessor, qSuccessor);
 
           builder.addTransition(from, to);
 
-          SimpleEntry<String, String> successor = new SimpleEntry<>(sSuccessor, qSuccessor);
-          if (!visited.contains(successor)) {
-            queue.add(successor);
+          if (!visited.contains(to)) {
+            queue.add(to);
             builder.addState(to);
             builder.addLabel(to, qSuccessor);
           }
@@ -122,20 +131,20 @@ public class TransitionSystem {
     return builder.build();
   }
 
-  private boolean cycleCheck(String s, Set<String> v, Stack<String> xi) {
+  private boolean cycleCheck(State s, Set<State> v, Stack<State> xi) {
     xi.push(s);
     v.add(s);
     while (!xi.isEmpty()) {
-      String s1 = xi.peek();
-      List<String> successors = getSuccessors(s1);
+      State s1 = xi.peek();
+      Set<State> successors = getSuccessors(s1);
       if (successors.contains(s)) {
         xi.push(s);
         return true;
       } else if (!v.containsAll(successors)) {
-        Set<String> remainingSuccessors = new HashSet<>(successors);
+        Set<State> remainingSuccessors = new HashSet<>(successors);
         remainingSuccessors.removeAll(v);
 
-        String s2 = remainingSuccessors.stream().findAny().get();
+        State s2 = remainingSuccessors.stream().findAny().get();
         v.add(s2);
         xi.push(s2);
       } else {
@@ -149,42 +158,42 @@ public class TransitionSystem {
   /**
    * @return whether the ts satisfies the persistence property 'eventually always P'
    */
-  public TSPersistenceResult checkPersistence(Set<String> persistentStates) {
+  public TSPersistenceResult checkPersistence(Set<State> persistentStates) {
     // run a nested-depth-first-search
-    Set<String> u = new HashSet<>();
-    Set<String> v = new HashSet<>();
+    Set<State> u = new HashSet<>();
+    Set<State> v = new HashSet<>();
 
-    Stack<String> pi = new Stack<>();
-    Stack<String> xi = new Stack<>();
+    Stack<State> pi = new Stack<>();
+    Stack<State> xi = new Stack<>();
 
     while (!u.containsAll(initialStates)) {
-      Set<String> remaining = new HashSet<>(initialStates);
+      Set<State> remaining = new HashSet<>(initialStates);
       remaining.removeAll(u);
 
-      String s0 = remaining.stream().findAny().get();
+      State s0 = remaining.stream().findAny().get();
       u.add(s0);
 
       pi.push(s0);
 
       while (!pi.isEmpty()) {
-        String s = pi.peek();
+        State s = pi.peek();
 
-        Set<String> remainingSuccessors = new HashSet<>(getSuccessors(s));
+        Set<State> remainingSuccessors = new HashSet<>(getSuccessors(s));
         remainingSuccessors.removeAll(u);
 
         if (!remainingSuccessors.isEmpty()) {
-          String s1 = remainingSuccessors.stream().findAny().get();
+          State s1 = remainingSuccessors.stream().findAny().get();
           u.add(s1);
           pi.push(s1);
         } else {
           pi.pop();
-          Set<String> labels = labelingFunction.get(s);
+          Set<APType> labels = labelingFunction.get(s);
 
           boolean notPersistentState = labels.stream().noneMatch(persistentStates::contains);
 
           if (notPersistentState && cycleCheck(s, v, xi)) {
-            List<String> piList = new ArrayList<>(pi);
-            List<String> xiList = new ArrayList<>(xi);
+            List<State> piList = new ArrayList<>(pi);
+            List<State> xiList = new ArrayList<>(xi);
 
             CyclePath witness = new CyclePath(piList, xiList);
             return notPersistent(witness);
@@ -196,32 +205,20 @@ public class TransitionSystem {
     return persistent();
   }
 
-  public void addAtomicProposition(String atomicProposition) {
+  public void addAtomicProposition(APType atomicProposition) {
     atomicPropositions.add(atomicProposition);
   }
 
-  public void removeAtomicProposition(String atomicProposition) {
+  public void removeAtomicProposition(APType atomicProposition) {
     atomicPropositions.remove(atomicProposition);
     labelingFunction.forEach((state, labels) -> labels.remove(atomicProposition));
-  }
-
-  public String introduceFreshAtomicProposition() {
-    int i = 0;
-    while (true) {
-      String atomicProposition = "a_" + i;
-      if (!atomicPropositions.contains(atomicProposition)) {
-        atomicPropositions.add(atomicProposition);
-        return atomicProposition;
-      }
-      i++;
-    }
   }
 
   public void clearInitialStates() {
     initialStates.clear();
   }
 
-  public void addInitialState(String state) {
+  public void addInitialState(State state) {
     initialStates.add(state);
   }
 
@@ -230,31 +227,27 @@ public class TransitionSystem {
     return toJson();
   }
 
-  public Set<String> getStates() {
+  public Set<State> getStates() {
     return states;
   }
 
-  public Set<String> getInitialStates() {
+  public Set<State> getInitialStates() {
     return initialStates;
   }
 
-  // todo: low hanging fruit: precompute successors
-  public List<String> getSuccessors(String state) {
-    return transitions.stream()
-        .filter(transition -> transition.getFrom().equals(state))
-        .map(TSTransition::getTo)
-        .toList();
+  public Set<State> getSuccessors(State state) {
+    return successors.getOrDefault(state, new HashSet<>());
   }
 
-  public Set<String> getAtomicPropositions() {
+  public Set<APType> getAtomicPropositions() {
     return atomicPropositions;
   }
 
-  public void addLabel(String state, String atomicProposition) {
+  public void addLabel(State state, APType atomicProposition) {
     labelingFunction.get(state).add(atomicProposition);
   }
 
-  public Set<String> getLabel(String state) {
+  public Set<APType> getLabel(State state) {
     return labelingFunction.get(state);
   }
 

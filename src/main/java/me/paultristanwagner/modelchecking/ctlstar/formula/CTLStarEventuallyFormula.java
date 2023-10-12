@@ -48,7 +48,7 @@ public class CTLStarEventuallyFormula extends CTLStarFormula {
 
   @Override
   public String toString() {
-    return Symbol.EVENTUALLY_SYMBOL + formula;
+    return Symbol.EVENTUALLY + formula;
   }
 
   public CTLStarFormula getFormula() {

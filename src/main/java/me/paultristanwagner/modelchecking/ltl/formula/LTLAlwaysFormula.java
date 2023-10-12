@@ -1,6 +1,6 @@
 package me.paultristanwagner.modelchecking.ltl.formula;
 
-import static me.paultristanwagner.modelchecking.util.Symbol.ALWAYS_SYMBOL;
+import static me.paultristanwagner.modelchecking.util.Symbol.ALWAYS;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +32,7 @@ public class LTLAlwaysFormula extends LTLFormula {
 
   @Override
   public String toString() {
-    return ALWAYS_SYMBOL + formula;
+    return ALWAYS + formula;
   }
 
   @Override

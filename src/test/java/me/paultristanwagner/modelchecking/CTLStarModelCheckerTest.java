@@ -11,7 +11,7 @@ import me.paultristanwagner.modelchecking.ctlstar.CTLStarModelChecker;
 import me.paultristanwagner.modelchecking.ctlstar.CTLStarModelCheckingResult;
 import me.paultristanwagner.modelchecking.ctlstar.formula.CTLStarFormula;
 import me.paultristanwagner.modelchecking.ctlstar.parse.CTLStarParser;
-import me.paultristanwagner.modelchecking.ts.TransitionSystem;
+import me.paultristanwagner.modelchecking.ts.BasicTransitionSystem;
 import me.paultristanwagner.modelchecking.ts.TransitionSystemLoader;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,7 @@ public class CTLStarModelCheckerTest {
         "exists always exists next (not a and not b)"
       };
 
-  private static TransitionSystem ts;
+  private static BasicTransitionSystem ts;
   private static CTLStarParser parser;
   private static CTLStarModelChecker modelChecker;
 

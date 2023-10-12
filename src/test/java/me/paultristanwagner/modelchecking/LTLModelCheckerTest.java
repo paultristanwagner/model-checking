@@ -11,7 +11,7 @@ import me.paultristanwagner.modelchecking.ltl.LTLModelChecker;
 import me.paultristanwagner.modelchecking.ltl.LTLModelCheckingResult;
 import me.paultristanwagner.modelchecking.ltl.formula.LTLFormula;
 import me.paultristanwagner.modelchecking.ltl.parse.LTLParser;
-import me.paultristanwagner.modelchecking.ts.TransitionSystem;
+import me.paultristanwagner.modelchecking.ts.BasicTransitionSystem;
 import me.paultristanwagner.modelchecking.ts.TransitionSystemLoader;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -36,7 +36,7 @@ public class LTLModelCheckerTest {
         "(always eventually a) and (eventually always b)"
       };
 
-  private static TransitionSystem ts;
+  private static BasicTransitionSystem ts;
   private static LTLParser parser;
   private static LTLModelChecker modelChecker;
 

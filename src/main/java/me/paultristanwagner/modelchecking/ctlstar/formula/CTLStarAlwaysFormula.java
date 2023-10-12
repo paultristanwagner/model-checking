@@ -50,7 +50,7 @@ public class CTLStarAlwaysFormula extends CTLStarFormula {
 
   @Override
   public String toString() {
-    return Symbol.ALWAYS_SYMBOL + formula;
+    return Symbol.ALWAYS + formula;
   }
 
   @Override

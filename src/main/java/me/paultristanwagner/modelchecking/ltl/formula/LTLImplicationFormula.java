@@ -1,6 +1,6 @@
 package me.paultristanwagner.modelchecking.ltl.formula;
 
-import static me.paultristanwagner.modelchecking.util.Symbol.IMPLICATION_SYMBOL;
+import static me.paultristanwagner.modelchecking.util.Symbol.IMPLICATION;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +39,7 @@ public class LTLImplicationFormula extends LTLFormula {
 
   @Override
   public String toString() {
-    return "(" + left + " " + IMPLICATION_SYMBOL + " " + right + ")";
+    return "(" + left + " " + IMPLICATION + " " + right + ")";
   }
 
   @Override

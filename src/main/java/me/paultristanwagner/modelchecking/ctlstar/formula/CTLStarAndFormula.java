@@ -1,6 +1,6 @@
 package me.paultristanwagner.modelchecking.ctlstar.formula;
 
-import static me.paultristanwagner.modelchecking.util.Symbol.AND_SYMBOL;
+import static me.paultristanwagner.modelchecking.util.Symbol.AND;
 
 import java.util.*;
 import me.paultristanwagner.modelchecking.ltl.formula.LTLAndFormula;
@@ -75,7 +75,7 @@ public class CTLStarAndFormula extends CTLStarFormula {
 
       if (i < components.size() - 1) {
         builder.append(" ");
-        builder.append(AND_SYMBOL);
+        builder.append(AND);
         builder.append(" ");
       }
     }

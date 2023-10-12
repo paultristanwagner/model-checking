@@ -1,6 +1,6 @@
 package me.paultristanwagner.modelchecking.ltl.formula;
 
-import static me.paultristanwagner.modelchecking.util.Symbol.EVENTUALLY_SYMBOL;
+import static me.paultristanwagner.modelchecking.util.Symbol.EVENTUALLY;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +38,7 @@ public class LTLEventuallyFormula extends LTLFormula {
 
   @Override
   public String toString() {
-    return EVENTUALLY_SYMBOL + formula;
+    return EVENTUALLY + formula;
   }
 
   @Override

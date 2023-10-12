@@ -1,6 +1,6 @@
 package me.paultristanwagner.modelchecking.ctlstar.formula;
 
-import static me.paultristanwagner.modelchecking.util.Symbol.NEXT_SYMBOL;
+import static me.paultristanwagner.modelchecking.util.Symbol.NEXT;
 
 import java.util.Objects;
 import java.util.Set;
@@ -51,7 +51,7 @@ public class CTLStarNextFormula extends CTLStarFormula {
 
   @Override
   public String toString() {
-    return NEXT_SYMBOL + formula;
+    return NEXT + formula;
   }
 
   @Override

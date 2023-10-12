@@ -1,6 +1,6 @@
 package me.paultristanwagner.modelchecking.ctl.formula.state;
 
-import static me.paultristanwagner.modelchecking.util.Symbol.NOT_SYMBOL;
+import static me.paultristanwagner.modelchecking.util.Symbol.NOT;
 
 public class CTLNotFormula extends CTLFormula {
 
@@ -20,6 +20,6 @@ public class CTLNotFormula extends CTLFormula {
 
   @Override
   public String toString() {
-    return NOT_SYMBOL + argument.toString();
+    return NOT + argument.toString();
   }
 }

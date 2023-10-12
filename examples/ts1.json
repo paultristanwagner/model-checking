@@ -1,38 +1,15 @@
 {
-  "states": [
-    "s0",
-    "s1",
-    "s2"
-  ],
-  "transitions": [
-    [
-      "s0",
-      "s1"
-    ],
-    [
-      "s0",
-      "s2"
-    ],
-    [
-      "s1",
-      "s1"
-    ],
-    [
-      "s2",
-      "s2"
-    ]
-  ],
-  "initialStates": [
-    "s0"
-  ],
-  "atomicPropositions": [
-    "a"
-  ],
+  "states": ["s0", "s1", "s2"],
+  "initialStates": ["s0"],
+  "successors": {
+    "s0": ["s1", "s2"],
+    "s1": ["s1"],
+    "s2": ["s2"]
+  },
+  "atomicPropositions": ["a"],
   "labelingFunction": {
     "s0": [],
-    "s1": [
-      "a"
-    ],
+    "s1": ["a"],
     "s2": []
   }
 }

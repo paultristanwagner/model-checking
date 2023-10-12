@@ -1,6 +1,6 @@
 package me.paultristanwagner.modelchecking.ctl.formula.path;
 
-import static me.paultristanwagner.modelchecking.util.Symbol.UNTIL_SYMBOL;
+import static me.paultristanwagner.modelchecking.util.Symbol.UNTIL;
 
 import me.paultristanwagner.modelchecking.ctl.formula.state.CTLFormula;
 
@@ -28,6 +28,6 @@ public class CTLUntilFormula extends CTLPathFormula {
 
   @Override
   public String toString() {
-    return "(" + left.toString() + " " + UNTIL_SYMBOL + " " + right.toString() + ")";
+    return "(" + left.toString() + " " + UNTIL + " " + right.toString() + ")";
   }
 }

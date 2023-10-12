@@ -7,22 +7,21 @@ import java.util.Set;
 
 public class NBATransition<ActionType> {
 
-  private final String from;
+  private final State from;
   private final ActionType action;
-  private final String to;
+  private final State to;
 
-  protected NBATransition(String from, ActionType action, String to) {
+  protected NBATransition(State from, ActionType action, State to) {
     this.from = from;
     this.action = action;
     this.to = to;
   }
 
-  public static <ActionType> NBATransition<ActionType> of(
-      String from, ActionType action, String to) {
+  public static <ActionType> NBATransition<ActionType> of(State from, ActionType action, State to) {
     return new NBATransition<>(from, action, to);
   }
 
-  public String getFrom() {
+  public State getFrom() {
     return from;
   }
 
@@ -30,7 +29,7 @@ public class NBATransition<ActionType> {
     return action;
   }
 
-  public String getTo() {
+  public State getTo() {
     return to;
   }
 
@@ -43,10 +42,10 @@ public class NBATransition<ActionType> {
         java.lang.reflect.Type typeOfSrc,
         JsonSerializationContext context) {
       JsonArray jsonArray = new JsonArray();
-      jsonArray.add(transition.getFrom());
+      jsonArray.add(context.serialize(transition.getFrom()));
       jsonArray.add(
           context.serialize(transition.getAction(), new TypeToken<String>() {}.getType()));
-      jsonArray.add(transition.getTo());
+      jsonArray.add(context.serialize(transition.getTo()));
 
       return jsonArray;
     }
@@ -56,9 +55,9 @@ public class NBATransition<ActionType> {
         JsonElement json, java.lang.reflect.Type typeOfT, JsonDeserializationContext context)
         throws JsonParseException {
       JsonArray tuple = json.getAsJsonArray();
-      String from = tuple.get(0).getAsString();
+      State from = context.deserialize(tuple.get(0), BasicState.class);
       String action = tuple.get(1).getAsString();
-      String to = tuple.get(2).getAsString();
+      State to = context.deserialize(tuple.get(2), BasicState.class);
       return NBATransition.of(from, action, to);
     }
   }
@@ -69,14 +68,11 @@ public class NBATransition<ActionType> {
 
     @Override
     public JsonElement serialize(
-        NBATransition<Set<String>> transition,
-        java.lang.reflect.Type typeOfSrc,
-        JsonSerializationContext context) {
+        NBATransition<Set<String>> src, Type typeOfSrc, JsonSerializationContext context) {
       JsonArray jsonArray = new JsonArray();
-      jsonArray.add(transition.getFrom());
-      jsonArray.add(
-          context.serialize(transition.getAction(), new TypeToken<Set<String>>() {}.getType()));
-      jsonArray.add(transition.getTo());
+      jsonArray.add(context.serialize(src.getFrom()));
+      jsonArray.add(context.serialize(src.getAction(), new TypeToken<Set<String>>() {}.getType()));
+      jsonArray.add(context.serialize(src.getTo()));
 
       return jsonArray;
     }
@@ -86,10 +82,10 @@ public class NBATransition<ActionType> {
         JsonElement json, Type typeOfT, JsonDeserializationContext context)
         throws JsonParseException {
       JsonArray tuple = json.getAsJsonArray();
-      String from = tuple.get(0).getAsString();
+      State from = context.deserialize(tuple.get(0), BasicState.class);
       Set<String> action =
           context.deserialize(tuple.get(1), new TypeToken<Set<String>>() {}.getType());
-      String to = tuple.get(2).getAsString();
+      State to = context.deserialize(tuple.get(2), BasicState.class);
       return NBATransition.of(from, action, to);
     }
   }

@@ -2,8 +2,8 @@ package me.paultristanwagner.modelchecking;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static me.paultristanwagner.modelchecking.util.AnsiColor.*;
-import static me.paultristanwagner.modelchecking.util.Symbol.MODELS_SYMBOL;
-import static me.paultristanwagner.modelchecking.util.Symbol.NOT_MODELS_SYMBOL;
+import static me.paultristanwagner.modelchecking.util.Symbol.MODELS;
+import static me.paultristanwagner.modelchecking.util.Symbol.NOT_MODELS;
 
 import com.google.gson.JsonSyntaxException;
 import java.io.*;
@@ -26,8 +26,8 @@ import me.paultristanwagner.modelchecking.ltl.LTLModelCheckingResult;
 import me.paultristanwagner.modelchecking.ltl.formula.LTLFormula;
 import me.paultristanwagner.modelchecking.ltl.parse.LTLParser;
 import me.paultristanwagner.modelchecking.parse.SyntaxError;
+import me.paultristanwagner.modelchecking.ts.BasicTransitionSystem;
 import me.paultristanwagner.modelchecking.ts.CyclePath;
-import me.paultristanwagner.modelchecking.ts.TransitionSystem;
 import me.paultristanwagner.modelchecking.ts.TransitionSystemLoader;
 import me.paultristanwagner.modelchecking.util.Symbol;
 
@@ -38,7 +38,7 @@ public class Main {
   public static final Scanner SCANNER = new Scanner(System.in);
 
   public static void main(String[] args) {
-    TransitionSystem ts = enterTransitionSystem();
+    BasicTransitionSystem ts = enterTransitionSystem();
     ts.verifyNoNullLabels();
 
     while (true) {
@@ -65,7 +65,7 @@ public class Main {
       ModelCheckingResult result;
       Optional<CyclePath> counterExample = Optional.empty();
       if (formula instanceof LTLFormula ltlFormula) {
-        phiSymbol = Symbol.LOWERCASE_PHI_SYMBOL;
+        phiSymbol = Symbol.LOWERCASE_PHI;
         OUT.println(phiSymbol + " := " + formula + GRAY + " (LTL)" + RESET);
 
         LTLModelChecker modelChecker = new BasicLTLModelChecker();
@@ -76,14 +76,14 @@ public class Main {
           counterExample = Optional.of(ltlModelCheckingResult.getCounterExample());
         }
       } else if (formula instanceof CTLFormula ctlFormula) {
-        phiSymbol = Symbol.UPPERCASE_PHI_SYMBOL;
+        phiSymbol = Symbol.UPPERCASE_PHI;
 
         OUT.println(phiSymbol + " := " + formula + GRAY + " (CTL)" + RESET);
 
         CTLModelChecker modelChecker = new BasicCTLModelChecker();
         result = modelChecker.check(ts, ctlFormula);
       } else if (formula instanceof CTLStarFormula ctlStarFormula) {
-        phiSymbol = Symbol.UPPERCASE_PHI_SYMBOL;
+        phiSymbol = Symbol.UPPERCASE_PHI;
 
         OUT.println(phiSymbol + " := " + formula + GRAY + " (CTL*)" + RESET);
 
@@ -95,9 +95,9 @@ public class Main {
       }
 
       if (result.isModel()) {
-        OUT.println(GREEN + "TS " + MODELS_SYMBOL + " " + phiSymbol + RESET);
+        OUT.println(GREEN + "TS " + MODELS + " " + phiSymbol + RESET);
       } else {
-        OUT.println(RED + "TS " + NOT_MODELS_SYMBOL + " " + phiSymbol);
+        OUT.println(RED + "TS " + NOT_MODELS + " " + phiSymbol);
         counterExample.ifPresent(infinitePath -> OUT.println("Counterexample: " + infinitePath));
         OUT.print(RESET);
       }
@@ -211,8 +211,8 @@ public class Main {
     return ctlStarParser.parse(string);
   }
 
-  private static TransitionSystem enterTransitionSystem() {
-    TransitionSystem ts = null;
+  private static BasicTransitionSystem enterTransitionSystem() {
+    BasicTransitionSystem ts = null;
     while (ts == null) {
       File file = null;
       String fileName = null;

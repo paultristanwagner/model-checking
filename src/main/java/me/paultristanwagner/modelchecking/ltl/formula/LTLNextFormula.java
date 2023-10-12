@@ -1,6 +1,6 @@
 package me.paultristanwagner.modelchecking.ltl.formula;
 
-import static me.paultristanwagner.modelchecking.util.Symbol.NEXT_SYMBOL;
+import static me.paultristanwagner.modelchecking.util.Symbol.NEXT;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +37,7 @@ public class LTLNextFormula extends LTLFormula {
 
   @Override
   public String toString() {
-    return NEXT_SYMBOL + formula;
+    return NEXT + formula;
   }
 
   @Override

@@ -1,11 +1,12 @@
 package me.paultristanwagner.modelchecking;
 
 import java.util.Set;
-import me.paultristanwagner.modelchecking.ts.TransitionSystem;
+import me.paultristanwagner.modelchecking.automaton.State;
+import me.paultristanwagner.modelchecking.ts.BasicTransitionSystem;
 
 public interface ModelChecker<T extends Formula, R extends ModelCheckingResult> {
 
-  R check(TransitionSystem ts, T formula);
+  R check(BasicTransitionSystem ts, T formula);
 
-  Set<String> sat(TransitionSystem ts, T formula);
+  Set<State> sat(BasicTransitionSystem ts, T formula);
 }

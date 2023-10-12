@@ -1,6 +1,6 @@
 package me.paultristanwagner.modelchecking.ctl.formula.state;
 
-import static me.paultristanwagner.modelchecking.util.Symbol.UNIVERSAL_QUANTIFIER_SYMBOL;
+import static me.paultristanwagner.modelchecking.util.Symbol.UNIVERSAL_QUANTIFIER;
 
 import me.paultristanwagner.modelchecking.ctl.formula.path.CTLPathFormula;
 
@@ -22,6 +22,6 @@ public class CTLAllFormula extends CTLFormula {
 
   @Override
   public String toString() {
-    return UNIVERSAL_QUANTIFIER_SYMBOL + pathFormula.toString();
+    return UNIVERSAL_QUANTIFIER + pathFormula.toString();
   }
 }

@@ -1,50 +1,16 @@
 {
-  "states": [
-    "q0",
-    "q1",
-    "q2"
-  ],
-  "alphabet": [
-    "true",
-    "crit1",
-    "crit2"
-  ],
-  "initialStates": [
-    "q0"
-  ],
+  "states": ["q0", "q1", "q2"],
+  "alphabet": ["true", "crit1", "crit2"],
+  "initialStates": ["q0"],
   "acceptingSets": [
-    [
-      "q1"
-    ],
-    [
-      "q2"
-    ]
+    ["q1"],
+    ["q2"]
   ],
-  "transitions": [
-    [
-      "q0",
-      "true",
-      "q0"
-    ],
-    [
-      "q0",
-      "crit1",
-      "q1"
-    ],
-    [
-      "q1",
-      "true",
-      "q0"
-    ],
-    [
-      "q0",
-      "crit2",
-      "q2"
-    ],
-    [
-      "q2",
-      "true",
-      "q0"
-    ]
+  "transitionFunction": [
+    ["q0", "true", "q0"],
+    ["q0", "crit1", "q1"],
+    ["q1", "true", "q0"],
+    ["q0", "crit2", "q2"],
+    ["q2", "true", "q0"]
   ]
 }

@@ -7,21 +7,22 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import me.paultristanwagner.modelchecking.automaton.State;
 import me.paultristanwagner.modelchecking.ctl.formula.path.CTLAlwaysFormula;
 import me.paultristanwagner.modelchecking.ctl.formula.path.CTLNextFormula;
 import me.paultristanwagner.modelchecking.ctl.formula.path.CTLPathFormula;
 import me.paultristanwagner.modelchecking.ctl.formula.path.CTLUntilFormula;
 import me.paultristanwagner.modelchecking.ctl.formula.state.*;
-import me.paultristanwagner.modelchecking.ts.TransitionSystem;
+import me.paultristanwagner.modelchecking.ts.BasicTransitionSystem;
 
 public class BasicCTLModelChecker implements CTLModelChecker {
 
   @Override
-  public CTLModelCheckingResult check(TransitionSystem ts, CTLFormula formula) {
+  public CTLModelCheckingResult check(BasicTransitionSystem ts, CTLFormula formula) {
     CTLENFConverter converter = new CTLENFConverter();
     CTLFormula enfFormula = converter.convert(formula);
 
-    Set<String> satStates = sat(ts, enfFormula);
+    Set<State> satStates = sat(ts, enfFormula);
 
     boolean models = satStates.containsAll(ts.getInitialStates());
 
@@ -33,7 +34,7 @@ public class BasicCTLModelChecker implements CTLModelChecker {
   }
 
   @Override
-  public Set<String> sat(TransitionSystem ts, CTLFormula formula) {
+  public Set<State> sat(BasicTransitionSystem ts, CTLFormula formula) {
     if (formula instanceof CTLIdentifierFormula identifierFormula) {
       return satIdentifier(ts, identifierFormula);
     } else if (formula instanceof CTLNotFormula notFormula) {
@@ -55,7 +56,7 @@ public class BasicCTLModelChecker implements CTLModelChecker {
     throw new UnsupportedOperationException();
   }
 
-  private Set<String> satExists(TransitionSystem ts, CTLExistsFormula formula) {
+  private Set<State> satExists(BasicTransitionSystem ts, CTLExistsFormula formula) {
     CTLPathFormula pathFormula = formula.getPathFormula();
     if (pathFormula instanceof CTLNextFormula nextFormula) {
       return satExistsNext(ts, nextFormula);
@@ -68,15 +69,15 @@ public class BasicCTLModelChecker implements CTLModelChecker {
     throw new UnsupportedOperationException();
   }
 
-  private Set<String> satExistsNext(TransitionSystem ts, CTLNextFormula nextFormula) {
-    Set<String> result = new HashSet<>();
-    Set<String> satStates = sat(ts, nextFormula.getStateFormula());
+  private Set<State> satExistsNext(BasicTransitionSystem ts, CTLNextFormula nextFormula) {
+    Set<State> result = new HashSet<>();
+    Set<State> satStates = sat(ts, nextFormula.getStateFormula());
 
-    for (String state : ts.getStates()) {
-      List<String> successors = ts.getSuccessors(state);
+    for (State state : ts.getStates()) {
+      Set<State> successors = ts.getSuccessors(state);
 
       boolean hasSatSuccessor = false;
-      for (String successor : successors) {
+      for (State successor : successors) {
         if (satStates.contains(successor)) {
           hasSatSuccessor = true;
           break;
@@ -91,26 +92,26 @@ public class BasicCTLModelChecker implements CTLModelChecker {
     return result;
   }
 
-  private Set<String> satExistsUntil(TransitionSystem ts, CTLUntilFormula untilFormula) {
+  private Set<State> satExistsUntil(BasicTransitionSystem ts, CTLUntilFormula untilFormula) {
     CTLFormula left = untilFormula.getLeft();
     CTLFormula right = untilFormula.getRight();
 
-    Set<String> satLeft = sat(ts, left);
+    Set<State> satLeft = sat(ts, left);
 
-    Set<String> T = sat(ts, right);
+    Set<State> T = sat(ts, right);
 
     boolean changed = true;
     while (changed) {
       changed = false;
 
-      for (String state : satLeft) {
+      for (State state : satLeft) {
         if (T.contains(state)) {
           continue;
         }
 
-        List<String> successors = ts.getSuccessors(state);
+        Set<State> successors = ts.getSuccessors(state);
         boolean hasTSuccessor = false;
-        for (String successor : successors) {
+        for (State successor : successors) {
           if (T.contains(successor)) {
             hasTSuccessor = true;
             break;
@@ -127,21 +128,21 @@ public class BasicCTLModelChecker implements CTLModelChecker {
     return T;
   }
 
-  private Set<String> satExistsAlways(TransitionSystem ts, CTLAlwaysFormula formula) {
+  private Set<State> satExistsAlways(BasicTransitionSystem ts, CTLAlwaysFormula formula) {
     CTLFormula stateFormula = formula.getStateFormula();
 
-    Set<String> V = sat(ts, stateFormula);
+    Set<State> V = sat(ts, stateFormula);
 
     boolean changed = true;
     while (changed) {
       changed = false;
 
-      Iterator<String> iterator = V.iterator();
+      Iterator<State> iterator = V.iterator();
       while (iterator.hasNext()) {
-        String state = iterator.next();
-        List<String> successors = ts.getSuccessors(state);
+        State state = iterator.next();
+        Set<State> successors = ts.getSuccessors(state);
         boolean hasVSuccessor = false;
-        for (String successor : successors) {
+        for (State successor : successors) {
           if (V.contains(successor)) {
             hasVSuccessor = true;
             break;
@@ -158,11 +159,11 @@ public class BasicCTLModelChecker implements CTLModelChecker {
     return V;
   }
 
-  private Set<String> satIdentifier(TransitionSystem ts, CTLIdentifierFormula formula) {
+  private Set<State> satIdentifier(BasicTransitionSystem ts, CTLIdentifierFormula formula) {
     String atomicProposition = formula.getIdentifier();
 
-    Set<String> satStates = new HashSet<>();
-    for (String state : ts.getStates()) {
+    Set<State> satStates = new HashSet<>();
+    for (State state : ts.getStates()) {
       if (ts.getLabel(state).contains(atomicProposition)) {
         satStates.add(state);
       }
@@ -171,18 +172,18 @@ public class BasicCTLModelChecker implements CTLModelChecker {
     return satStates;
   }
 
-  private Set<String> satNot(TransitionSystem ts, CTLNotFormula formula) {
-    Set<String> satStates = sat(ts, formula.getArgument());
-    Set<String> allStates = new HashSet<>(ts.getStates());
+  private Set<State> satNot(BasicTransitionSystem ts, CTLNotFormula formula) {
+    Set<State> satStates = sat(ts, formula.getArgument());
+    Set<State> allStates = new HashSet<>(ts.getStates());
 
-    Set<String> result = new HashSet<>(allStates);
+    Set<State> result = new HashSet<>(allStates);
     result.removeAll(satStates);
 
     return result;
   }
 
-  private Set<String> satOr(TransitionSystem ts, CTLOrFormula formula) {
-    Set<String> result = new HashSet<>();
+  private Set<State> satOr(BasicTransitionSystem ts, CTLOrFormula formula) {
+    Set<State> result = new HashSet<>();
     List<CTLFormula> components = formula.getComponents();
     for (CTLFormula component : components) {
       result.addAll(sat(ts, component));
@@ -191,8 +192,8 @@ public class BasicCTLModelChecker implements CTLModelChecker {
     return result;
   }
 
-  private Set<String> satAnd(TransitionSystem ts, CTLAndFormula formula) {
-    Set<String> result = new HashSet<>(ts.getStates());
+  private Set<State> satAnd(BasicTransitionSystem ts, CTLAndFormula formula) {
+    Set<State> result = new HashSet<>(ts.getStates());
     List<CTLFormula> components = formula.getComponents();
     for (CTLFormula component : components) {
       result.retainAll(sat(ts, component));
@@ -201,11 +202,11 @@ public class BasicCTLModelChecker implements CTLModelChecker {
     return result;
   }
 
-  private Set<String> satTrue(TransitionSystem ts, CTLTrueFormula formula) {
+  private Set<State> satTrue(BasicTransitionSystem ts, CTLTrueFormula formula) {
     return new HashSet<>(ts.getStates());
   }
 
-  private Set<String> satFalse(TransitionSystem ts, CTLFalseFormula formula) {
+  private Set<State> satFalse(BasicTransitionSystem ts, CTLFalseFormula formula) {
     return new HashSet<>();
   }
 }

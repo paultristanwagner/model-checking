@@ -11,7 +11,7 @@ import me.paultristanwagner.modelchecking.ctl.CTLModelChecker;
 import me.paultristanwagner.modelchecking.ctl.CTLModelCheckingResult;
 import me.paultristanwagner.modelchecking.ctl.formula.state.CTLFormula;
 import me.paultristanwagner.modelchecking.ctl.parse.CTLParser;
-import me.paultristanwagner.modelchecking.ts.TransitionSystem;
+import me.paultristanwagner.modelchecking.ts.BasicTransitionSystem;
 import me.paultristanwagner.modelchecking.ts.TransitionSystemLoader;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,7 @@ public class CTLModelCheckerTest {
         "exists always exists next (not a and not b)"
       };
 
-  private static TransitionSystem ts;
+  private static BasicTransitionSystem ts;
   private static CTLParser parser;
   private static CTLModelChecker modelChecker;
 

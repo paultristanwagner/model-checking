@@ -1,14 +1,13 @@
 {
-  "states": ["start","try_to_send","lost","delivered"],
-  "transitions": [
-    ["start","try_to_send"],
-    ["try_to_send","lost"],
-    ["lost","try_to_send"],
-    ["try_to_send","delivered"],
-    ["delivered","start"]
-  ],
+  "states": ["start", "try_to_send", "lost", "delivered"],
   "initialStates": ["start"],
-  "atomicPropositions": ["start","try_to_send","lost","delivered"],
+  "successors": {
+    "start": ["try_to_send"],
+    "try_to_send": ["lost", "delivered"],
+    "lost": ["try_to_send"],
+    "delivered": ["start"]
+  },
+  "atomicPropositions": ["start", "try_to_send", "lost", "delivered"],
   "labelingFunction": {
     "start": ["start"],
     "try_to_send": ["try_to_send"],
