@@ -1,7 +1,7 @@
 # Model Checking
 
 This project is a practice environment for implementing algorithms related to model checking.
-The techniques used here are used here are introduced in the RWTH Aachen University lecture 'Model Checking'
+The techniques used here are introduced in the RWTH Aachen University lecture 'Model Checking'
 by [Prof. Dr. Ir. Dr. h. c. Joost-Pieter Katoen](https://moves.rwth-aachen.de/people/katoen/)
 and can be read up in the
 book [Principles of Model Checking](https://mitpress.mit.edu/9780262026499/principles-of-model-checking/) by Christel
