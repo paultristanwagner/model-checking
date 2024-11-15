@@ -10,17 +10,13 @@ Baier and Joost-Pieter Katoen.
 Model checking is a technique used to formally verify whether a given system model satisfies a desired property or
 specification. In this project, model checking algorithms are implemented to analyze transition systems.
 
-## How to build and run the project
-
-Clone the git repository: <br>
-``git clone https://github.com/paultristanwagner/model-checking.git`` <br>
-Navigate into the created directory: <br>
-``cd model-checking`` <br>
-Let Gradle build the project (Use the Gradle wrapper as shown here or install Gradle >= 8.1.1): <br>
-``./gradlew jar`` <br>
-Run the project: <br>
-``java -jar build/libs/model-checking-1.0-SNAPSHOT.jar`` <br>
-Now you should see the command line asking you to specify a file defining a transition system.
+## How to Run the Model Checker
+Under [Releases](https://github.com/paultristanwagner/model-checking/releases) you can find the latest version of the model checker.
+Download the jar file and run it with the following command: <br>
+```
+java -jar model-checking-v1.0.0.jar
+```
+Now you should the command line asking you to specify a file defining a transition system.
 
 ## Transition systems
 
@@ -147,6 +143,17 @@ plays a significant role. In many cases, LTL formulas can be exponentially short
 means that even though CTL model checking has a better complexity class, the actual runtime can be influenced by the
 size of the formula. Therefore, the efficiency of model checking depends not only on the computational complexity class
 but also on the specific properties being checked and the lengths of the corresponding formulas in LTL and CTL.
+
+## Optional: Build the Model Checker from Source
+Let Gradle build the project (Use the Gradle wrapper as shown here or install Gradle >= 8.1.1): <br>
+```
+./gradlew jar
+```
+Run the project: <br>
+```
+java -jar build/libs/model-checking-1.0-SNAPSHOT.jar
+```
+Now you should see the command line asking you to specify a file defining a transition system.
 
 ## Contributing
 
